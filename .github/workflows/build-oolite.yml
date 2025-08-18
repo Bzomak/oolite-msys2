@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
@@ -120,7 +120,7 @@ jobs:
           install_script: ./deps/eSpeak/install.sh
 
       - name: Checkout Oolite
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: OoliteProject/oolite
           path: oolite
@@ -155,7 +155,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
@@ -238,7 +238,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Load dependency data into env
         shell: bash
@@ -262,7 +262,7 @@ jobs:
 
       - name: Checkout tools-make
         if: steps.cache-status.outputs.early_exit != 'success'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gnustep/tools-make
           path: tools-make
@@ -297,7 +297,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Load dependency data into env
         shell: bash
@@ -335,7 +335,7 @@ jobs:
 
       - name: Checkout libs-base
         if: steps.early-exit.conclusion != 'success'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gnustep/libs-base
           path: libs-base
@@ -370,7 +370,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Load dependency data into env
         shell: bash
@@ -433,7 +433,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Load dependency data into env
         shell: bash
@@ -499,7 +499,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
@@ -548,7 +548,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
@@ -588,7 +588,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: List Oolite caches created by this workflow run
         run: |
@@ -617,7 +617,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up msys2
         uses: msys2/setup-msys2@v2
@@ -656,10 +656,10 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout Oolite
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: OoliteProject/oolite
           path: oolite
@@ -692,7 +692,7 @@ jobs:
 # This uses git ls-remote to check if the provided ref exists in the Oolite repository.
 # Branches and tags are supported.
 # Commit hashes can not be detected by git ls-remote. We need to find an alternative way to check if a commit hash exists in the remote repository.
-# While actions/checkout@v4 supports checking out from a commit hash, we cannot use them until we have a way to confirm that it is a valid commit.
+# While actions/checkout@v5 supports checking out from a commit hash, we cannot use them until we have a way to confirm that it is a valid commit.
 
   check-oolite-ref:
     name: Check Oolite ref is valid
