@@ -13,6 +13,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '14 3 * * *'
+permissions:
+  contents: read
 jobs:
 
 ########################################
