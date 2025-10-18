@@ -60,6 +60,7 @@ on:
         default: master
 permissions:
   contents: read
+  actions: write
 jobs:
 
 ########################################
