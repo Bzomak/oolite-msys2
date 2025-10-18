@@ -58,6 +58,8 @@ on:
         required: true
         type: string
         default: master
+permissions:
+  contents: read
 jobs:
 
 ########################################
