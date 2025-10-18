@@ -13,6 +13,8 @@ name: Test repository
 on:
   workflow_call:
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
 
 ########################################
