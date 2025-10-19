@@ -10,15 +10,15 @@ runs:
   using: 'composite'
 
   steps:
-      - name: Extract dependencies from ${{ inputs.deps_path }}
-        id: extract-deps
-        uses: ./.github/actions/extract-data-string-from-file
-        with:
-          path: ${{ inputs.deps_path }}
+    - name: Extract dependencies from ${{ inputs.deps_path }}
+      id: extract-deps
+      uses: ./.github/actions/extract-data-string-from-file
+      with:
+        path: ${{ inputs.deps_path }}
 
-      - name: Start MSYS2 with dependencies
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: ${{ steps.extract-deps.outputs.data }}
+    - name: Start MSYS2 with dependencies
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: ${{ steps.extract-deps.outputs.data }}

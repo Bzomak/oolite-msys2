@@ -14,13 +14,13 @@ runs:
   using: 'composite'
 
   steps:
-      - name: Extract data string from ${{ inputs.path }}
-        id: extract-data-string
-        shell: bash
-        run: |
-          DATA=$(cat "${{ inputs.path }}")
-          {
-            echo "data<<EOF"
-            echo "$DATA"
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+    - name: Extract data string from ${{ inputs.path }}
+      id: extract-data-string
+      shell: bash
+      run: |
+        DATA=$(cat "${{ inputs.path }}")
+        {
+          echo "data<<EOF"
+          echo "$DATA"
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
