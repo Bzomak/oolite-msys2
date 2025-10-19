@@ -47,6 +47,9 @@ jobs:
 
   build-oolite:
     needs: check-recent-oolite-commits
+    permissions:
+      contents: read
+      actions: write
     if: ${{ needs.check-recent-oolite-commits.outputs.has_commits == 'true' }}
     uses: ./.github/workflows/build-oolite.yml
     with:
