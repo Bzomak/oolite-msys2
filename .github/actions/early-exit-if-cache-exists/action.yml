@@ -37,7 +37,7 @@ runs:
 
     - name: Early exit if cache exists and not building from fresh
       id: early-exit
-      if: ${{ inputs.from_fresh == false && steps.check-cache.outputs.cache-hit == 'true' }}
+      if: ${{ inputs.from_fresh == 'false' && steps.check-cache.outputs.cache-hit == 'true' }}
       shell: bash
       run: |
         echo "${{ inputs.name }} cache exists, exiting early" >> $GITHUB_STEP_SUMMARY
