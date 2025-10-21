@@ -18,24 +18,24 @@ cd oolite || exit
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
 # C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: ./obj.win.spk/oolite.obj/OODebugSupport.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: multiple definition of `glClampColor'; ./obj.win.spk/oolite.obj/OODebugMonitor.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: first defined here
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85678
-sed -i '36 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
+sed -i '30 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
 
 # Fix inability to find js lib
 # Uncomment JS_LIB_DIR
-sed -i '25 s/^#//' GNUMakefile
+sed -i '19 s/^#//' GNUMakefile
 # Add JS_LIB_DIR to ADDITIONAL_OBJC_LIBS
 # shellcheck disable=SC2016
-sed -i '33 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
+sed -i '27 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
 
 # Use tool.make instead of objc.make
-sed -i '452 s/objc.make/tool.make/' GNUMakefile
+sed -i '90 s/objc.make/tool.make/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble 
 
 # Rename targets to make clear what they do
-sed -i '271 s/release //' Makefile
-sed -i '275 s/release-deployment //' Makefile
-sed -i '280 s/release-snapshot //' Makefile
+sed -i '258 s/release //' Makefile
+sed -i '262 s/release-deployment //' Makefile
+sed -i '267 s/release-snapshot //' Makefile
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
 # Stop the installer from rebuilding Oolite
@@ -46,13 +46,13 @@ sed -i 's|/nsis/makensis.exe|/mingw64/bin/makensis.exe|' Makefile
 sed -i '59,70 s/^/#/' Gnumakefile.postamble
 
 # Use pre-build MSYS2 png and openal
-sed -i '33 s/-lopenal32.dll -lpng14.dll/-lopenal.dll -lpng16.dll/' GNUMakefile
+sed -i '27 s/-lopenal32.dll -lpng14.dll/-lopenal.dll -lpng16.dll/' GNUMakefile
 
 # Remove the oolite-windows-dependencies repo's include & libs folders
 # shellcheck disable=SC2016
-sed -i '32 s/-I$(WIN_DEPS_DIR)\/include //' GNUMakefile
+sed -i '26 s/-I$(WIN_DEPS_DIR)\/include //' GNUMakefile
 # shellcheck disable=SC2016
-sed -i '33 s/-L$(WIN_DEPS_DIR)\/lib //' GNUMakefile
+sed -i '27 s/-L$(WIN_DEPS_DIR)\/lib //' GNUMakefile
 
 # Copy the espeak-data folder
 sed -i '46 s/^/#/' Gnumakefile.postamble
@@ -60,7 +60,7 @@ sed -i '48 s/^/#/' Gnumakefile.postamble
 sed -i '52 s/^/#/' Gnumakefile.postamble
 
 # Link to espeak and portaudio
-sed -i '45 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
+sed -i '34 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
 # Try to build
 # shellcheck source=/dev/null

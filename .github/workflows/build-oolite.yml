@@ -329,6 +329,7 @@ jobs:
           deps_path: deps/libs-base/msys2-deps
 
       - name: Install built version of tools-make from cache
+        if: steps.early-exit.conclusion != 'success'
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make

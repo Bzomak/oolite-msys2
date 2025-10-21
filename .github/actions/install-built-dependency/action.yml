@@ -19,14 +19,14 @@ runs:
   using: 'composite'
 
   steps:
-      - name: Retrieve ${{ inputs.name }} cache
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ inputs.path }}
-          key: ${{ inputs.key }}
-          fail-on-cache-miss: true
+    - name: Retrieve ${{ inputs.name }} cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
+        fail-on-cache-miss: true
 
-      - name: Install ${{ inputs.name }}
-        shell: msys2 {0}
-        run: |
-          bash ${{ inputs.install_script }}
+    - name: Install ${{ inputs.name }}
+      shell: msys2 {0}
+      run: |
+        bash ${{ inputs.install_script }}

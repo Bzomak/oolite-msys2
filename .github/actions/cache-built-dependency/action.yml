@@ -19,15 +19,15 @@ runs:
   using: 'composite'
 
   steps:
-      - name: Delete existing ${{ inputs.name }} cache
-        if: ${{ inputs.delete_existing_cache == 'true' }}
-        shell: bash
-        run: |
-          echo "Deleting pre-existing cache" >> $GITHUB_STEP_SUMMARY
-          gh cache delete ${{ inputs.key }}
+    - name: Delete existing ${{ inputs.name }} cache
+      if: ${{ inputs.delete_existing_cache == 'true' }}
+      shell: bash
+      run: |
+        echo "Deleting pre-existing cache" >> $GITHUB_STEP_SUMMARY
+        gh cache delete ${{ inputs.key }}
 
-      - name: Cache ${{ inputs.name }} build
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ inputs.path }}
-          key: ${{ inputs.key }}
+    - name: Cache ${{ inputs.name }} build
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ inputs.path }}
+        key: ${{ inputs.key }}
