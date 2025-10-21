@@ -62,8 +62,8 @@ sed -i '52 s/^/#/' Gnumakefile.postamble
 # Link to espeak and portaudio
 sed -i '34 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
-# Try to provide missing headers for some Windows COM interfaces
-sed -i '/#include <shlwapi.h>/i #include <windows.h>\n#include <unknwn.h>\n#include <objbase.h>' src/Core/OXPVerifier/OOOXPVerifier.m
+# Try to define 'interface' to avoid errors building OXPVerifier
+sed -i '/#include <shlwapi.h>/i #ifndef __cplusplus\n#ifndef interface\n#define interface struct\n#endif\n#endif' src/Core/OXPVerifier/OOOXPVerifier.m
 
 # Try to build
 # shellcheck source=/dev/null
