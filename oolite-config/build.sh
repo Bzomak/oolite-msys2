@@ -63,7 +63,12 @@ sed -i '52 s/^/#/' Gnumakefile.postamble
 sed -i '34 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
 # Try to define 'interface' to avoid errors building OXPVerifier
-sed -i '/#include <shlwapi.h>/i #ifndef __cplusplus\n#ifndef interface\n#define interface struct\n#endif\n#endif' src/Core/OXPVerifier/OOOXPVerifier.m
+#sed -i '/#include <shlwapi.h>/i #ifndef __cplusplus\n#ifndef interface\n#define interface struct\n#endif\n#endif' src/Core/OXPVerifier/OOOXPVerifier.m
+
+# Add Foundation import to Core headers to avoid errors building OXPVerifier
+sed -i '/^@interface/i\
+#import <Foundation/Foundation.h>' src/Core/*.h
+
 
 # Try to build
 # shellcheck source=/dev/null
