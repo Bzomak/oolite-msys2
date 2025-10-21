@@ -62,6 +62,9 @@ sed -i '52 s/^/#/' Gnumakefile.postamble
 # Link to espeak and portaudio
 sed -i '34 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
+# Try to provide missing headers for some Windows COM interfaces
+sed -i '/#include <shlwapi.h>/i #include <windows.h>\n#include <unknwn.h>\n#include <objbase.h>' src/Core/OXPVerifier/OOOXPVerifier.m
+
 # Try to build
 # shellcheck source=/dev/null
 . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
