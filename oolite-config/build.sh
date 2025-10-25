@@ -66,9 +66,11 @@ sed -i '34 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 #sed -i '/#include <shlwapi.h>/i #ifndef __cplusplus\n#ifndef interface\n#define interface struct\n#endif\n#endif' src/Core/OXPVerifier/OOOXPVerifier.m
 
 # Add Foundation import to Core headers to avoid errors building OXPVerifier
-sed -i '/^@interface/i\
-#import <Foundation/Foundation.h>' src/Core/*.h
+#sed -i '/^@interface/i\
+##import <Foundation/Foundation.h>' src/Core/*.h
 
+#Try forcing objective c compilation mode
+sed -i '30, s/$/ -x objective-c/' GNUMakefile
 
 # Try to build
 # shellcheck source=/dev/null
