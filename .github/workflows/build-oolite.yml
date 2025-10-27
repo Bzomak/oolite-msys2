@@ -216,7 +216,7 @@ jobs:
           bash ./oolite-installer-config/build.sh ${{ matrix.build_type }}
 
       - name: Upload Oolite installers as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: oolite-${{ matrix.build_type }}.exe
           path: |
@@ -533,7 +533,7 @@ jobs:
           make -j $(nproc) check
 
       - name: Upload tests.log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: libs-base_test.log
           path: |
@@ -681,7 +681,7 @@ jobs:
           find ./oolite/Doc -name "*.odt" -exec soffice --headless --convert-to pdf:"writer_pdf_Export" --outdir oolite/Doc {} \;
 
       - name: Store pdfs as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pdfs
           path: ./oolite/Doc/*.pdf
