@@ -20,6 +20,10 @@ git fetch --unshallow
 git stash
 git revert --no-commit 0031890efd38021567d4d5a4d28b1418a34768d1
 
+# Comment out Windows version checks in /mingw64/include/wingdi.h
+sed -i '2396 s|^|//|' /mingw64/include/wingdi.h
+sed -i '2447 s|^|//|' /mingw64/include/wingdi.h
+
 # Add -fobjc-exceptions and -fcommon to OBJC flags in GNUMakefile, line 36
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
 # C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: ./obj.win.spk/oolite.obj/OODebugSupport.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: multiple definition of `glClampColor'; ./obj.win.spk/oolite.obj/OODebugMonitor.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: first defined here
