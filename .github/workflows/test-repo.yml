@@ -65,73 +65,218 @@ jobs:
 # Test extract-data-string-from-file action
 
   test-extract-data-string-from-file:
+    name: Test extract-data-string-from-file action
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Test extract-data-string-from-file
+      - name: Remove default problem matcher
+        run: |
+          echo "::remove-matcher owner=checkout-git::"
+
+      - name: Test - Extracting a single word from a file
         id: extract-data-single-word
+        if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
           path: ./.github/actions/extract-data-string-from-file/test/single-word
 
-      - name: Check output
+      - name: Result - Extracting a single word from a file
+        id: extract-data-single-word-result
+        if: always()
         run: |
+          echo "Extracted data is: '${{ steps.extract-data-single-word.outputs.data }}'"
           if [[ "${{ steps.extract-data-single-word.outputs.data }}" != "foo" ]]; then
             echo "Extracted data is not 'foo'"
-            echo "Extracted data is '${{ steps.extract-data-single-word.outputs.data }}'"
             exit 1
+          else
+            echo "Test successful"
           fi
 
-      - name: Test extract-data-string-from-file
+      - name: Test - Extracting multiple words from a file
         id: extract-data-multiple-words
+        if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
           path: ./.github/actions/extract-data-string-from-file/test/multiple-words
 
-      - name: Check output
+      - name: Result - Extracting multiple words from a file
+        id: extract-data-multiple-words-result
+        if: always()
         run: |
+          echo "Extracted data is: '${{ steps.extract-data-multiple-words.outputs.data }}'"
           if [[ "${{ steps.extract-data-multiple-words.outputs.data }}" != "foo bar" ]]; then
             echo "Extracted data is not 'foo bar'"
-            echo "Extracted data is '${{ steps.extract-data-multiple-words.outputs.data }}'"
             exit 1
+          else
+            echo "Test successful"
           fi
 
-      - name: Test extract-data-string-from-file
+      - name: Test - Extracting multiple lines from a file
         id: extract-data-multiple-lines
+        if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
           path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
 
-      - name: Check output
+      - name: Result - Extracting multiple lines from a file
+        id: extract-data-multiple-lines-result
+        if: always()
         run: |
+          echo "Extracted data is: '${{ steps.extract-data-multiple-lines.outputs.data }}'"
           if [[ "${{ steps.extract-data-multiple-lines.outputs.data }}" != $'foo\nbar' ]]; then
-          echo "Extracted data is ${{ steps.extract-data-multiple-lines.outputs.data }}"
-          echo "Extracted data is not $'foo\nbar'"
+            echo "Extracted data is not $'foo\nbar'"
             exit 1
+          else
+            echo "Test successful"
           fi
 
-      - name: Test extract-data-string-from-file
+      - name: Test - Extracting an empty file
         id: extract-data-empty
+        if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
           path: ./.github/actions/extract-data-string-from-file/test/empty
 
-      - name: Check output
+      - name: Result - Extracting an empty file
+        id: extract-data-empty-result
+        if: always()
         run: |
+          echo "Extracted data is: '${{ steps.extract-data-empty.outputs.data }}'"
           if [[ "${{ steps.extract-data-empty.outputs.data }}" != "" ]]; then
-          echo "Extracted data is '${{ steps.extract-data-empty.outputs.data }}'"
-          echo "Extracted data is not ''"
+            echo "Extracted data is not ''"
             exit 1
+          else
+            echo "Test successful"
           fi
 
+      - name: Test - Extracting a file with spaces
+        id: extract-data-spaces
+        if: always()
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path: ./.github/actions/extract-data-string-from-file/test/spaces
 
+      - name: Result - Extracting a file with spaces
+        id: extract-data-spaces-result
+        if: always()
+        run: |
+          echo "Extracted data is: '${{ steps.extract-data-empty.outputs.data }}'"
+          if [[ "${{ steps.extract-data-empty.outputs.data }}" != "" ]]; then
+            echo "Extracted data is not ''"
+            exit 1
+          else
+            echo "Test successful"
+          fi
 
-# Need to check what happens if the path does not exist
-# Need to check what happens if the path is empty
-# Need to check what happens if the path is not a file
-# Need to check what happens if the string is empty
+      - name: Test - Extracting from a non-existent file
+        id: extract-non-existent-file
+        if: always()
+        continue-on-error: true
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path: ./.github/actions/extract-data-string-from-file/test/non-existent-file
+
+      - name: Result - Extracting from a non-existent file
+        id: extract-non-existent-file-result
+        if: always()
+        run: |
+          echo "Action error is: '${{ steps.extract-non-existent-file.outputs.error }}'"
+          if [[ "${{ steps.extract-non-existent-file.outputs.error }}" != "Path does not exist" ]]; then
+            echo "Action error is not 'Path does not exist'"
+            exit 1
+          else
+            echo "Test successful"
+          fi
+
+      - name: Test - Extracting from a directory
+        id: extract-directory
+        if: always()
+        continue-on-error: true
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path: ./.github/actions/extract-data-string-from-file/test/
+
+      - name: Result - Extracting from a directory
+        id: extract-directory-result
+        if: always()
+        run: |
+          echo "Action error is: '${{ steps.extract-directory.outputs.error }}'"
+          if [[ "${{ steps.extract-directory.outputs.error }}" != "Path is a directory" ]]; then
+            echo "Action error is not 'Path is a directory'"
+            exit 1
+          else
+            echo "Test successful"
+          fi
+
+      - name: Test - Extracting from an empty path
+        id: extract-empty-path
+        if: always()
+        continue-on-error: true
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path:
+
+      - name: Result - Extracting from an empty path
+        id: extract-empty-path-result
+        if: always()
+        run: |
+          echo "Action error is: '${{ steps.extract-empty-path.outputs.error }}'"
+          if [[ "${{ steps.extract-empty-path.outputs.error }}" != "Path is required" ]]; then
+            echo "Action error is not 'Path is required'"
+            exit 1
+          else
+            echo "Test successful"
+          fi
+
+      - name: Test - Extracting from a path with spaces
+        id: extract-path-with-spaces
+        if: always()
+        continue-on-error: true
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path: '  '
+
+      - name: Result - Extracting from a path with spaces
+        id: extract-path-with-spaces-result
+        if: always()
+        run: |
+          echo "Action error is: '${{ steps.extract-empty-path.outputs.error }}'"
+          if [[ "${{ steps.extract-empty-path.outputs.error }}" != "Path is required" ]]; then
+            echo "Action error is not 'Path is required'"
+            exit 1
+          else
+            echo "Test successful"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          bash ./.github/actions/gen-test-summary-md.sh \
+            "extract-data-string-from-file" \
+            "Extracting a single word from a file" \
+            ${{ steps.extract-data-single-word-result.outcome }} \
+            "Extracting multiple words from a file" \
+            ${{ steps.extract-data-multiple-words-result.outcome }} \
+            "Extracting multiple lines from a file" \
+            ${{ steps.extract-data-multiple-lines-result.outcome }} \
+            "Extracting an empty file" \
+            ${{ steps.extract-data-empty-result.outcome }} \
+            "Extracting a file with spaces" \
+            ${{ steps.extract-data-spaces-result.outcome }} \
+            "Extracting from a non-existent file" \
+            ${{ steps.extract-non-existent-file-result.outcome }} \
+            "Extracting from a directory" \
+            ${{ steps.extract-directory-result.outcome }} \
+            "Extracting from an empty path" \
+            ${{ steps.extract-empty-path-result.outcome }} \
+            "Extracting from a path with spaces" \
+            ${{ steps.extract-path-with-spaces-result.outcome }}
 
 ########################################
 ########################################
