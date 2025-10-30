@@ -75,9 +75,9 @@ jobs:
       - name: Checkout this repository
         uses: actions/checkout@v4
 
-      - name: Remove default problem matcher
+      - name: Remove all problem matchers
         run: |
-          echo "::remove-matcher owner=checkout-git::"
+          echo "::remove-matcher::"
 
       - name: Test - Extracting a single word from a file
         id: extract-data-single-word
