@@ -351,7 +351,7 @@ jobs:
           name: libs-base
           path: libs-base
           key: cache-libs-base-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/libs-base/*', '**/deps/tools-make/*') }}
-          delete_existing_cache: ${{ inputs.from_fresh == true && steps.check-cache.outputs.cache-hit == 'true' }}
+          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
 
@@ -408,7 +408,7 @@ jobs:
           name: SDL
           path: SDL-1.2.13
           key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
-          delete_existing_cache: ${{ inputs.from_fresh == true && steps.check-cache.outputs.cache-hit == 'true' }}
+          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
 
