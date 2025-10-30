@@ -437,7 +437,7 @@ jobs:
         uses: ./.github/actions/early-exit-if-cache-exists
         with:
           name: eSpeak
-          path: espeak
+          path: espeak-1.43.03-source
           key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
           from_fresh: ${{ inputs.from_fresh }}
 
