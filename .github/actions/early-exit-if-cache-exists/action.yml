@@ -16,6 +16,9 @@ inputs:
     description: Build from scratch and overwrite any existing cache
     required: true
 outputs:
+  cache_hit:
+    description: Whether the cache hit or not
+    value: ${{ steps.check-cache.outputs.cache-hit }}
   early_exit:
     description: Whether the job exited early or not
     value: ${{ steps.early-exit.outputs.conclusion }}
