@@ -258,13 +258,13 @@ jobs:
           from_fresh: ${{ inputs.from_fresh }}
 
       - name: Set up msys2
-        if: steps.cache-status.outputs.early_exit != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/start-msys2-with-deps
         with:
           deps_path: deps/tools-make/msys2-deps
 
       - name: Checkout tools-make
-        if: steps.cache-status.outputs.early_exit != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: actions/checkout@v5
         with:
           repository: gnustep/tools-make
@@ -272,12 +272,12 @@ jobs:
           ref: ${{ env.TOOLS_MAKE_VERSION }}
 
       - name: Configure and build tools-make
-        if: steps.cache-status.outputs.early_exit != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         run: |
           bash ./deps/tools-make/build.sh
 
       - name: Cache tools-make build
-        if: steps.cache-status.outputs.early_exit != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/cache-built-dependency
         with:
           name: tools-make
