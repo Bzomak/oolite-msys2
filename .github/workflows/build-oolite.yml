@@ -432,46 +432,40 @@ jobs:
         run: |
           echo ESPEAK_VERSION=$(cat deps/espeak/version) >> $GITHUB_ENV
 
-      - name: Check for pre-existing eSpeak cache
-        id: check-cache
-        uses: actions/cache/restore@v4
+      - name: Check cache status
+        id: cache-status
+        uses: ./.github/actions/early-exit-if-cache-exists
         with:
+          name: eSpeak
           path: espeak
           key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          lookup-only: true
-
-      - name: Early exit if cache exists and not building from fresh
-        id: early-exit
-        if: ${{ inputs.from_fresh == false && steps.check-cache.outputs.cache-hit == 'true' }}
-        shell: bash
-        run: |
-          echo "eSpeak cache exists, exiting early" >> $GITHUB_STEP_SUMMARY
+          from_fresh: ${{ inputs.from_fresh }}
 
       - name: Set up msys2
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/start-msys2-with-deps
         with:
           deps_path: deps/espeak/msys2-deps
 
       - name: Download and extract eSpeak
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         run: |
           wget ${{ env.ESPEAK_VERSION }}
           unzip espeak-1.43.03-source.zip
 
       - name: Configure and build eSpeak
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         run: |
           bash ./deps/espeak/build.sh
 
       - name: Cache eSpeak build
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/cache-built-dependency
         with:
           name: eSpeak
           path: espeak-1.43.03-source
           key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          delete_existing_cache: ${{ inputs.from_fresh == true && steps.check-cache.outputs.cache-hit == 'true' }}
+          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
 ########################################
