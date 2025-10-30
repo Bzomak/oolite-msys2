@@ -77,7 +77,12 @@ jobs:
 
       - name: Remove all problem matchers
         run: |
-          echo "::remove-matcher::"
+          echo "::remove-matcher owner=checkout-git::"
+          echo "::remove-matcher owner=eslint-compact::"
+          echo "::remove-matcher owner=eslint-stylish::"
+          echo "::remove-matcher owner=tsc::"
+          echo "::remove-matcher owner=mscompile::"
+          echo "::remove-matcher owner=node::"
 
       - name: Test - Extracting a single word from a file
         id: extract-data-single-word
