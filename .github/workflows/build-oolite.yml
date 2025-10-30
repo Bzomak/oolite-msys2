@@ -307,29 +307,23 @@ jobs:
         run: |
           echo LIBS_BASE_VERSION=$(cat deps/libs-base/version) >> $GITHUB_ENV
 
-      - name: Check for pre-existing libs-base cache
-        id: check-cache
-        uses: actions/cache/restore@v4
+      - name: Check cache status
+        id: cache-status
+        uses: ./.github/actions/early-exit-if-cache-exists
         with:
+          name: libs-base
           path: libs-base
           key: cache-libs-base-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/libs-base/*', '**/deps/tools-make/*') }}
-          lookup-only: true
-
-      - name: Early exit if cache exists and not building from fresh
-        id: early-exit
-        if: ${{ inputs.from_fresh == false && steps.check-cache.outputs.cache-hit == 'true' }}
-        shell: bash
-        run: |
-          echo "libs-base cache exists, exiting early" >> $GITHUB_STEP_SUMMARY
+          from_fresh: ${{ inputs.from_fresh }}
 
       - name: Set up msys2
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/start-msys2-with-deps
         with:
           deps_path: deps/libs-base/msys2-deps
 
       - name: Install built version of tools-make from cache
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make
@@ -338,7 +332,7 @@ jobs:
           install_script: ./deps/tools-make/install.sh
 
       - name: Checkout libs-base
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: actions/checkout@v5
         with:
           repository: gnustep/libs-base
@@ -346,12 +340,12 @@ jobs:
           ref: ${{ env.LIBS_BASE_VERSION }}
 
       - name: Configure and build libs-base
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         run: |
           bash ./deps/libs-base/build.sh
 
       - name: Cache libs-base build
-        if: steps.early-exit.conclusion != 'success'
+        if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/cache-built-dependency
         with:
           name: libs-base
