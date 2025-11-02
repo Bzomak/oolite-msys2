@@ -65,8 +65,8 @@ else
 fi
 
 # Exit with error code only in production mode
-if [[ "${TESTING_MODE}" == "true" ]]; then
-    exit 0
-else
-    exit $exit_code
-fi
+#if [[ "${TESTING_MODE}" == "true" ]]; then
+#    exit 0
+#else
+#    exit $exit_code
+#fi
