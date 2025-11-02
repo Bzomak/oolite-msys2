@@ -290,6 +290,7 @@ jobs:
     #env:
       #TESTING_MODE: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: "Extracting a single word from a file"
