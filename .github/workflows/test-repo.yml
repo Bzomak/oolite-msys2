@@ -70,8 +70,8 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      TESTING_MODE: true
+#    env:
+#      TESTING_MODE: true
 
     steps:
       - name: Checkout this repository
@@ -287,8 +287,8 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      TESTING_MODE: true
+    #env:
+      #TESTING_MODE: true
     strategy:
       matrix:
         include:
