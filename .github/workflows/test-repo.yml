@@ -70,19 +70,14 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      TESTING_MODE: true
 
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v4
 
-      - name: Remove all problem matchers
-        run: |
-          echo "::remove-matcher owner=checkout-git::"
-          echo "::remove-matcher owner=eslint-compact::"
-          echo "::remove-matcher owner=eslint-stylish::"
-          echo "::remove-matcher owner=tsc::"
-          echo "::remove-matcher owner=mscompile::"
-          echo "::remove-matcher owner=node::"
+      # Tests expected to succeed
 
       - name: Test - Extracting a single word from a file
         id: extract-data-single-word
@@ -178,6 +173,8 @@ jobs:
           else
             echo "Test successful"
           fi
+
+      # Tests expected to fail
 
       - name: Test - Extracting from a non-existent file
         id: extract-non-existent-file
@@ -282,6 +279,50 @@ jobs:
             ${{ steps.extract-empty-path-result.outcome }} \
             "Extracting from a path with spaces" \
             ${{ steps.extract-path-with-spaces-result.outcome }}
+
+
+  test-extract-data-string-from-file-matrix:
+    name: Test extract-data-string-from-file action
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      TESTING_MODE: true
+    strategy:
+      matrix:
+        include:
+          - name: "Extracting a single word from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/single-word
+          - name: "Extracting multiple words from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/multiple-words
+          - name: "Extracting multiple lines from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
+          - name: "Extracting an empty file"
+            path: ./.github/actions/extract-data-string-from-file/test/empty
+          - name: "Extracting a file with spaces"
+            path: ./.github/actions/extract-data-string-from-file/test/spaces
+          - name: "Extracting from a non-existent file"
+            path: ./.github/actions/extract-data-string-from-file/test/non-existent
+          - name: "Extracting from a directory"
+            path: ./.github/actions/extract-data-string-from-file/test/directory
+          - name: "Extracting from an empty path"
+            path: ./.github/actions/extract-data-string-from-file/test/empty-path
+          - name: "Extracting from a path with spaces"
+            path: ./.github/actions/extract-data-string-from-file/test/path-with-spaces
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      # Tests expected to succeed
+
+      - name: Test - ${{ matrix.name }}
+        id: extract-data-single-word
+        if: always()
+        uses: ./.github/actions/extract-data-string-from-file
+        with:
+          path: ${{ matrix.path }}
 
 ########################################
 ########################################

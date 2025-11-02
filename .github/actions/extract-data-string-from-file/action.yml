@@ -13,6 +13,9 @@ outputs:
   error:
     description: Error message if any
     value: ${{ steps.extract-data-string.outputs.error }}
+  success:
+    description: Whether the operation was successful
+    value: ${{ steps.extract-data-string.outputs.success }}
 runs:
   using: 'composite'
 
@@ -20,5 +23,7 @@ runs:
     - name: Validate and extract contents of ${{ inputs.path }} to $GITHUB_OUTPUT
       id: extract-data-string
       shell: bash
+      env:
+        TESTING_MODE: ${{ env.TESTING_MODE || 'false' }}
       run: |
         bash ./.github/actions/extract-data-string-from-file/extract-data-string-from-file.sh ${{ inputs.path }}
