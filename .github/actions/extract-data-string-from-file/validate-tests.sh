@@ -57,4 +57,5 @@ cat > "test-results/${test_id}.json" << EOF
 {
     "name": "${test_name}",
     "result": "${test_passed}",
+}
 EOF
