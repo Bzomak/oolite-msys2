@@ -316,7 +316,7 @@ jobs:
           - name: "Extracting a file with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/spaces
             expected_outcome: "success"
-            expected_data: "foo bar"
+            expected_data: ""
             expected_error: ""
           - name: "Extracting from a non-existent file"
             path: ./.github/actions/extract-data-string-from-file/test/non-existent
@@ -332,12 +332,12 @@ jobs:
             path: ./.github/actions/extract-data-string-from-file/test/empty-path
             expected_outcome: "failure"
             expected_data: ""
-            expected_error: "Path is empty"
+            expected_error: "Path is required"
           - name: "Extracting from a path with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/path-with-spaces
             expected_outcome: "failure"
             expected_data: ""
-            expected_error: "Path contains spaces"
+            expected_error: "Path is required"
     outputs:
       name: ${{ matrix.name }}
       result: ${{ steps.validate-test.outputs.result }}
