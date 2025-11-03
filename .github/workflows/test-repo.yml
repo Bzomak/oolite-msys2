@@ -70,8 +70,8 @@ jobs:
     defaults:
       run:
         shell: bash
-#    env:
-#      TESTING_MODE: true
+    env:
+      TESTING_MODE: true
 
     steps:
       - name: Checkout this repository
@@ -287,8 +287,8 @@ jobs:
     defaults:
       run:
         shell: bash
-    #env:
-      #TESTING_MODE: true
+    env:
+      TESTING_MODE: true
     strategy:
       fail-fast: false
       matrix:
@@ -298,41 +298,49 @@ jobs:
             expected_outcome: "success"
             expected_data: "foo"
             expected_error: ""
+
           - name: "Extracting multiple words from a file"
             path: ./.github/actions/extract-data-string-from-file/test/multiple-words
             expected_outcome: "success"
             expected_data: "foo bar"
             expected_error: ""
+
           - name: "Extracting multiple lines from a file"
             path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
             expected_outcome: "success"
             expected_data: "foo\nbar"
             expected_error: ""
+
           - name: "Extracting an empty file"
             path: ./.github/actions/extract-data-string-from-file/test/empty
             expected_outcome: "success"
             expected_data: ""
             expected_error: ""
+
           - name: "Extracting a file with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/spaces
             expected_outcome: "success"
             expected_data: ""
             expected_error: ""
+
           - name: "Extracting from a non-existent file"
             path: ./.github/actions/extract-data-string-from-file/test/non-existent
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path does not exist"
+
           - name: "Extracting from a directory"
-            path: ./.github/actions/extract-data-string-from-file/test/test
+            path: ./.github/actions/extract-data-string-from-file/test
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path is a directory"
+
           - name: "Extracting from an empty path"
             path: 
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path is required"
+
           - name: "Extracting from a path with spaces"
             path: '  '
             expected_outcome: "failure"
