@@ -295,35 +295,100 @@ jobs:
         include:
           - name: "Extracting a single word from a file"
             path: ./.github/actions/extract-data-string-from-file/test/single-word
+            expected_outcome: "success"
+            expected_data: "foo"
+            expected_error: ""
           - name: "Extracting multiple words from a file"
             path: ./.github/actions/extract-data-string-from-file/test/multiple-words
+            expected_outcome: "success"
+            expected_data: "foo bar"
+            expected_error: ""
           - name: "Extracting multiple lines from a file"
             path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
+            expected_outcome: "success"
+            expected_data: "foo\nbar"
+            expected_error: ""
           - name: "Extracting an empty file"
             path: ./.github/actions/extract-data-string-from-file/test/empty
+            expected_outcome: "success"
+            expected_data: ""
+            expected_error: ""
           - name: "Extracting a file with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/spaces
+            expected_outcome: "success"
+            expected_data: "foo bar"
+            expected_error: ""
           - name: "Extracting from a non-existent file"
             path: ./.github/actions/extract-data-string-from-file/test/non-existent
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path does not exist"
           - name: "Extracting from a directory"
             path: ./.github/actions/extract-data-string-from-file/test/directory
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path is a directory"
           - name: "Extracting from an empty path"
             path: ./.github/actions/extract-data-string-from-file/test/empty-path
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path is empty"
           - name: "Extracting from a path with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/path-with-spaces
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path contains spaces"
+    outputs:
+      name: ${{ matrix.name }}
+      result: ${{ steps.validate-test.outputs.result }}
 
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v4
 
-      # Tests expected to succeed
-
       - name: Test - ${{ matrix.name }}
-        id: extract-data-single-word
+        id: extract-data
         if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
           path: ${{ matrix.path }}
+
+      - name: Validate - ${{ matrix.name }}
+        id: validate-test
+        if: always()
+        run: |
+          bash ./.github/actions/extract-data-string-from-file/validate-tests.sh \
+            "${{ matrix.name }}" \
+            "${{ matrix.expected_outcome }}" \
+            "${{ matrix.expected_data }}" \
+            "${{ matrix.expected_error }}" \
+            "${{ steps.extract-data.outputs.success }}" \
+            "${{ steps.extract-data.outputs.data }}" \
+            "${{ steps.extract-data.outputs.error }}"
+
+  Summary:
+    needs: test-extract-data-string-from-file-matrix
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+
+      - name: Validate all test results
+        if: always()
+        env:
+          TESTING_MODE: true
+        run: |
+          #!/bin/bash
+          
+          echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|---------|" >> $GITHUB_STEP_SUMMARY
+
+          # Each matrix job becomes an entry in 'needs.test'
+          for job in $(jq -r 'keys[]' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}'); do
+            name=$(jq -r --arg job "$job" '.[$job].outputs.name' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}')
+            result=$(jq -r --arg job "$job" '.[$job].outputs.result' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}')
+            echo "| ${name} | ${result} |" >> $GITHUB_STEP_SUMMARY
+          done
 
 ########################################
 ########################################
