@@ -22,7 +22,6 @@ NC='\033[0m'
 
 # Initialize test result variables
 test_passed=false
-test_message=""
 
 echo -e "\n${YELLOW}Validating: $test_name${NC}"
 
@@ -31,33 +30,22 @@ if [[ "$expected_outcome" == "success" ]]; then
     if [[ "$actual_success" == "true" && "$actual_data" == "$expected_data" ]]; then
         echo -e "${GREEN}✅ PASS: Got expected data '$expected_data'${NC}"
         test_passed=true
-        test_message="PASS: Got expected data '$expected_data'"
     else
         echo -e "${RED}❌ FAIL: Expected success=true with data '$expected_data', got success='$actual_success' with data '$actual_data'${NC}"
         test_passed=false
-        test_message="FAIL: Expected success=true with data '$expected_data', got success='$actual_success' with data '$actual_data'"
     fi
 else
     # For failure tests, check success=false and correct error
     if [[ "$actual_success" == "false" && "$actual_error" == *"$expected_error"* ]]; then
         echo -e "${GREEN}✅ PASS: Got expected error containing '$expected_error'${NC}"
         test_passed=true
-        test_message="PASS: Got expected error containing '$expected_error'"
     else
         echo -e "${RED}❌ FAIL: Expected success=false with error containing '$expected_error', got success='$actual_success' with error '$actual_error'${NC}"
         test_passed=false
-        test_message="FAIL: Expected success=false with error containing '$expected_error', got success='$actual_success' with error '$actual_error'"
     fi
 fi
-# Output results to GITHUB_OUTPUT
+
+# Output result to GITHUB_OUTPUT
 if [[ -n "$GITHUB_OUTPUT" ]]; then
-    {
-        echo "test_passed=$test_passed"
-        echo "test_message<<EOF"
-        echo "$test_message"
-        echo "EOF"
-        echo "test_name<<EOF"
-        echo "$test_name"
-        echo "EOF"
-    } >> "$GITHUB_OUTPUT"
+    echo "result=$test_passed" >> "$GITHUB_OUTPUT"
 fi
