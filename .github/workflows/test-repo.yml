@@ -324,17 +324,17 @@ jobs:
             expected_data: ""
             expected_error: "Path does not exist"
           - name: "Extracting from a directory"
-            path: ./.github/actions/extract-data-string-from-file/test/directory
+            path: ./.github/actions/extract-data-string-from-file/test/test
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path is a directory"
           - name: "Extracting from an empty path"
-            path: ./.github/actions/extract-data-string-from-file/test/empty-path
+            path: 
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path is required"
           - name: "Extracting from a path with spaces"
-            path: ./.github/actions/extract-data-string-from-file/test/path-with-spaces
+            path: '  '
             expected_outcome: "failure"
             expected_data: ""
             expected_error: "Path is required"
