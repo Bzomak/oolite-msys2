@@ -366,29 +366,62 @@ jobs:
             "${{ steps.extract-data.outputs.data }}" \
             "${{ steps.extract-data.outputs.error }}"
 
+      - name: Upload test result
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-result-${{ strategy.job-index }}
+          path: test-results/
+
   Summary:
     needs: test-extract-data-string-from-file-matrix
     runs-on: ubuntu-latest
     if: always()
     steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-result-*
+          merge-multiple: true
+          path: test-results
 
-      - name: Validate all test results
+      - name: Summarize all test results
         if: always()
         env:
           TESTING_MODE: true
         run: |
-          #!/bin/bash
-          
           echo "### Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Test | Result |" >> $GITHUB_STEP_SUMMARY
           echo "|------|---------|" >> $GITHUB_STEP_SUMMARY
 
-          # Each matrix job becomes an entry in 'needs.test'
-          for job in $(jq -r 'keys[]' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}'); do
-            name=$(jq -r --arg job "$job" '.[$job].outputs.name' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}')
-            result=$(jq -r --arg job "$job" '.[$job].outputs.result' <<< '${{ toJson(needs.test-extract-data-string-from-file-matrix) }}')
-            echo "| ${name} | ${result} |" >> $GITHUB_STEP_SUMMARY
+          total_tests=0
+          passed_tests=0
+          
+          for result_file in test-results/*.json; do
+            if [[ -f "$result_file" ]]; then
+              name=$(jq -r '.name' "$result_file")
+              result=$(jq -r '.result' "$result_file")
+              
+              total_tests=$((total_tests + 1))
+              
+              if [[ "$result" == "true" ]]; then
+                echo "| $name | ✅ PASS |" >> $GITHUB_STEP_SUMMARY
+                passed_tests=$((passed_tests + 1))
+              else
+                echo "| $name | ❌ FAIL |" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
           done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Summary:** $passed_tests/$total_tests tests passed" >> $GITHUB_STEP_SUMMARY
+
+      - name: Delete artifacts after processing
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: test-result-*
+          useGlob: true
+          failOnError: false
 
 ########################################
 ########################################

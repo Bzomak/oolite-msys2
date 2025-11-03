@@ -49,3 +49,12 @@ fi
 if [[ -n "$GITHUB_OUTPUT" ]]; then
     echo "result=$test_passed" >> "$GITHUB_OUTPUT"
 fi
+
+# Create result file with unique name
+mkdir -p test-results
+test_id=$(echo "${test_name}" | tr ' ' '_' | tr -cd '[:alnum:]_')
+cat > "test-results/${test_id}.json" << EOF
+{
+    "name": "${test_name}",
+    "result": "${test_passed}",
+EOF
