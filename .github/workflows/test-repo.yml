@@ -373,6 +373,12 @@ jobs:
           name: test-result-${{ strategy.job-index }}
           path: test-results/
 
+      - name: Mark as failed
+        if: ${{ steps.validate-test.outputs.result == 'false' }}
+        run: |
+          echo "Marking job as failed due to test failure"
+          exit 1
+
   Summary:
     needs: test-extract-data-string-from-file-matrix
     runs-on: ubuntu-latest
