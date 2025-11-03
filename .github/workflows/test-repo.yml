@@ -166,8 +166,8 @@ jobs:
         id: extract-data-spaces-result
         if: always()
         run: |
-          echo "Extracted data is: '${{ steps.extract-data-empty.outputs.data }}'"
-          if [[ "${{ steps.extract-data-empty.outputs.data }}" != "" ]]; then
+          echo "Extracted data is: '${{ steps.extract-data-spaces.outputs.data }}'"
+          if [[ "${{ steps.extract-data-spaces.outputs.data }}" != "" ]]; then
             echo "Extracted data is not ''"
             exit 1
           else
