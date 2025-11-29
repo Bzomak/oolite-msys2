@@ -10,17 +10,20 @@ outputs:
   data:
     description: Data string extracted from the file
     value: ${{ steps.extract-data-string.outputs.data }}
+  error:
+    description: Error message if any
+    value: ${{ steps.extract-data-string.outputs.error }}
+  success:
+    description: Whether the operation was successful
+    value: ${{ steps.extract-data-string.outputs.success }}
 runs:
   using: 'composite'
 
   steps:
-    - name: Extract data string from ${{ inputs.path }}
+    - name: Validate and extract contents of ${{ inputs.path }} to $GITHUB_OUTPUT
       id: extract-data-string
       shell: bash
+      env:
+        TESTING_MODE: ${{ env.TESTING_MODE || 'false' }}
       run: |
-        DATA=$(cat "${{ inputs.path }}")
-        {
-          echo "data<<EOF"
-          echo "$DATA"
-          echo "EOF"
-        } >> $GITHUB_OUTPUT
+        bash ./.github/actions/extract-data-string-from-file/extract-data-string-from-file.sh ${{ inputs.path }}

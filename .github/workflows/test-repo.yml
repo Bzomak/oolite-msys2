@@ -64,74 +64,112 @@ jobs:
 
 # Test extract-data-string-from-file action
 
-  test-extract-data-string-from-file:
+  test-extract-data-string-from-file-matrix:
+    name: Test extract-data-string-from-file action
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      TESTING_MODE: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Extracting a single word from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/single-word
+            expected_outcome: "success"
+            expected_data: "foo"
+            expected_error: ""
+
+          - name: "Extracting multiple words from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/multiple-words
+            expected_outcome: "success"
+            expected_data: "foo bar"
+            expected_error: ""
+
+          - name: "Extracting multiple lines from a file"
+            path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
+            expected_outcome: "success"
+            expected_data: "foo\nbar"
+            expected_error: ""
+
+          - name: "Extracting an empty file"
+            path: ./.github/actions/extract-data-string-from-file/test/empty
+            expected_outcome: "success"
+            expected_data: ""
+            expected_error: ""
+
+          - name: "Extracting a file with spaces"
+            path: ./.github/actions/extract-data-string-from-file/test/spaces
+            expected_outcome: "success"
+            expected_data: "  "
+            expected_error: ""
+
+          - name: "Extracting from a non-existent file"
+            path: ./.github/actions/extract-data-string-from-file/test/non-existent
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path does not exist"
+
+          - name: "Extracting from a directory"
+            path: ./.github/actions/extract-data-string-from-file/test
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path is a directory"
+
+          - name: "Extracting from an empty path"
+            path: 
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path is required"
+
+          - name: "Extracting from a path with spaces"
+            path: '  '
+            expected_outcome: "failure"
+            expected_data: ""
+            expected_error: "Path is required"
+    outputs:
+      name: ${{ matrix.name }}
+      result: ${{ steps.validate-test.outputs.result }}
+
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Test extract-data-string-from-file
-        id: extract-data-single-word
+      - name: Test - ${{ matrix.name }}
+        continue-on-error: true
+        id: extract-data
+        if: always()
         uses: ./.github/actions/extract-data-string-from-file
         with:
-          path: ./.github/actions/extract-data-string-from-file/test/single-word
+          path: ${{ matrix.path }}
 
-      - name: Check output
+      - name: Validate - ${{ matrix.name }}
+        id: validate-test
+        if: always()
         run: |
-          if [[ "${{ steps.extract-data-single-word.outputs.data }}" != "foo" ]]; then
-            echo "Extracted data is not 'foo'"
-            echo "Extracted data is '${{ steps.extract-data-single-word.outputs.data }}'"
-            exit 1
-          fi
+          bash ./.github/actions/extract-data-string-from-file/validate-tests.sh \
+            "${{ matrix.name }}" \
+            "${{ matrix.expected_outcome }}" \
+            "${{ matrix.expected_data }}" \
+            "${{ matrix.expected_error }}" \
+            "${{ steps.extract-data.outputs.success }}" \
+            "${{ steps.extract-data.outputs.data }}" \
+            "${{ steps.extract-data.outputs.error }}"
 
-      - name: Test extract-data-string-from-file
-        id: extract-data-multiple-words
-        uses: ./.github/actions/extract-data-string-from-file
+      - name: Upload test result
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          path: ./.github/actions/extract-data-string-from-file/test/multiple-words
+          name: test-result-extract-data-string-from-file-${{ strategy.job-index }}
+          path: test-results/
 
-      - name: Check output
+      - name: Mark as failed
+        if: ${{ steps.validate-test.outputs.result == 'false' }}
         run: |
-          if [[ "${{ steps.extract-data-multiple-words.outputs.data }}" != "foo bar" ]]; then
-            echo "Extracted data is not 'foo bar'"
-            echo "Extracted data is '${{ steps.extract-data-multiple-words.outputs.data }}'"
-            exit 1
-          fi
-
-      - name: Test extract-data-string-from-file
-        id: extract-data-multiple-lines
-        uses: ./.github/actions/extract-data-string-from-file
-        with:
-          path: ./.github/actions/extract-data-string-from-file/test/multiple-lines
-
-      - name: Check output
-        run: |
-          if [[ "${{ steps.extract-data-multiple-lines.outputs.data }}" != $'foo\nbar' ]]; then
-          echo "Extracted data is ${{ steps.extract-data-multiple-lines.outputs.data }}"
-          echo "Extracted data is not $'foo\nbar'"
-            exit 1
-          fi
-
-      - name: Test extract-data-string-from-file
-        id: extract-data-empty
-        uses: ./.github/actions/extract-data-string-from-file
-        with:
-          path: ./.github/actions/extract-data-string-from-file/test/empty
-
-      - name: Check output
-        run: |
-          if [[ "${{ steps.extract-data-empty.outputs.data }}" != "" ]]; then
-          echo "Extracted data is '${{ steps.extract-data-empty.outputs.data }}'"
-          echo "Extracted data is not ''"
-            exit 1
-          fi
-
-
-
-# Need to check what happens if the path does not exist
-# Need to check what happens if the path is empty
-# Need to check what happens if the path is not a file
-# Need to check what happens if the string is empty
+          echo "Marking job as failed due to test failure"
+          exit 1
 
 ########################################
 ########################################
@@ -155,6 +193,40 @@ jobs:
 # Need to compare a clean install with one that has added dependencies
 # Need to check what happens with multiple dependencies
 # Need to check what happens with a group dependency
+
+########################################
+########################################
+########################################
+
+# Summarize test results
+
+  Summary:
+    name: Test Results
+    needs: test-extract-data-string-from-file-matrix
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-result-*
+          merge-multiple: true
+          path: test-results
+
+      - name: Summarize all test results
+        if: always()
+        run: |
+          bash ./.github/actions/gen-test-summary-md.sh
+
+      - name: Delete artifacts after processing
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: test-result-*
+          useGlob: true
+          failOnError: false
 
 ########################################
 ########################################
