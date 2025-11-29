@@ -8,55 +8,44 @@
 #
 ###############################
 
-SUCCESS_COUNT=0
-FAILURE_COUNT=0
-TEST_SUMMARY=""
+test_summary=""
+total_tests=0
+passed_tests=0
+failed_tests=0
 
-# Extract the title from the arguments
-title="$1"
-shift  # This removes the first argument
+{
+    echo "### Test Summary"
+    echo "| Test | Result |"
+    echo "|------|---------|"
+} >> "$test_summary"
 
-# Check that the number of arguments is even (pairs of name and result)
-if (( $# % 2 != 0 )); then
-    echo "Error: Arguments must come in pairs of name and result"
-    exit 1
-fi
-
-# Iterate over arguments two at a time
-for ((i=1; i<=$#; i+=2)); do
-    # Use indirect parameter expansion to get the value of the argument
-    name="${!i}"
-    next_index=$((i+1))
-    result="${!next_index}"
-
-    # Validate the name and result
-    if [[ -z "$name" ]]; then
-        echo "Error: Name at position $i is empty"
-        exit 1
-    fi
-    if [[ -z "$result" ]]; then
-        echo "Error: Result at position $((i+1)) is empty"
-        exit 1
-    fi
-
-    # Now you can use $name and $result in your script
-    echo "Name: $name, Result: $result"
-
-    if [[ $result == "success" ]]; then
-        SUCCESS_COUNT=$((SUCCESS_COUNT+1))
-        TEST_SUMMARY+="✔️ $name<br>"
+for result_file in test-results/*.json; do
+if [[ -f "$result_file" ]]; then
+    name=$(jq -r '.name' "$result_file")
+    result=$(jq -r '.result' "$result_file")
+    
+    total_tests=$((total_tests + 1))
+    
+    if [[ "$result" == "true" ]]; then
+    echo "| $name | ✅ PASS |" >> "$test_summary"
+    passed_tests=$((passed_tests + 1))
     else
-        FAILURE_COUNT=$((FAILURE_COUNT+1))
-        TEST_SUMMARY+="❌ $name<br>"
+    echo "| $name | ❌ FAIL |" >> "$test_summary"
+    failed_tests=$((failed_tests + 1))
     fi
+fi
 done
+
+echo "" >> "$test_summary"
+echo "**Summary:** $passed_tests/$total_tests tests passed" >> "$test_summary"
+
 
 # Generate the summary markdown
 {
-    echo "## $title Test Results"
+    echo "## Test Results"
     echo ""
-    echo "### Passed ✔️: $SUCCESS_COUNT | Failed ❌: $FAILURE_COUNT"
+    echo "### Passed ✔️: $passed_tests | Failed ❌: $failed_tests"
     echo ""
     echo "#### Tests:"
-    echo "$TEST_SUMMARY"
+    echo "$test_summary"
 } >> "$GITHUB_STEP_SUMMARY"
