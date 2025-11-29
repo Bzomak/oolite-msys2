@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
@@ -135,7 +135,7 @@ jobs:
 
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Test - ${{ matrix.name }}
         continue-on-error: true
@@ -207,7 +207,7 @@ jobs:
     if: always()
     steps:
       - name: Checkout this repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download all test results
         uses: actions/download-artifact@v4
