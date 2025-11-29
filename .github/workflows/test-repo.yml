@@ -201,6 +201,7 @@ jobs:
 # Summarize test results
 
   Summary:
+    name: Test Results
     needs: test-extract-data-string-from-file-matrix
     runs-on: ubuntu-latest
     if: always()

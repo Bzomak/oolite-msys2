@@ -56,6 +56,7 @@ test_id=$(echo "${test_name}" | tr ' ' '_' | tr -cd '[:alnum:]_')
 cat > "test-results/${test_id}.json" << EOF
 {
     "name": "${test_name}",
-    "result": "${test_passed}"
+    "result": "${test_passed}",
+    "job_type": "extract-data-string-from-file"
 }
 EOF
