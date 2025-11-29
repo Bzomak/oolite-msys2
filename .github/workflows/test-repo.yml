@@ -320,7 +320,7 @@ jobs:
           - name: "Extracting a file with spaces"
             path: ./.github/actions/extract-data-string-from-file/test/spaces
             expected_outcome: "success"
-            expected_data: ""
+            expected_data: "  "
             expected_error: ""
 
           - name: "Extracting from a non-existent file"
