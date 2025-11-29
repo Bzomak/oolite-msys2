@@ -1,51 +1,56 @@
-#! /usr/bin/bash
+#!/usr/bin/bash
+# filepath: c:\Users\Robert\Documents\GitHub\oolite-msys2\.github\actions\gen-test-summary-md.sh
 
 ###############################
 #
 # Take a list of outcomes and names of tests and generate Markdown for "$GITHUB_STEP_SUMMARY"
 #
-# Usage: Call `bash gen-test-summary-md.sh [input_path]` from the run step in the workflow file
+# Usage: Call `bash gen-test-summary-md.sh` from the run step in the workflow file
 #
 ###############################
 
-test_summary=""
 total_tests=0
 passed_tests=0
 failed_tests=0
+
+# Create a temporary file for building the test table
+temp_table=$(mktemp)
 
 {
     echo "### Test Summary"
     echo "| Test | Result |"
     echo "|------|---------|"
-} >> "$test_summary"
+} > "$temp_table"
 
 for result_file in test-results/*.json; do
-if [[ -f "$result_file" ]]; then
-    name=$(jq -r '.name' "$result_file")
-    result=$(jq -r '.result' "$result_file")
-    
-    total_tests=$((total_tests + 1))
-    
-    if [[ "$result" == "true" ]]; then
-    echo "| $name | ✅ PASS |" >> "$test_summary"
-    passed_tests=$((passed_tests + 1))
-    else
-    echo "| $name | ❌ FAIL |" >> "$test_summary"
-    failed_tests=$((failed_tests + 1))
+    if [[ -f "$result_file" ]]; then
+        name=$(jq -r '.name' "$result_file")
+        result=$(jq -r '.result' "$result_file")
+        total_tests=$((total_tests + 1))
+        if [[ "$result" == "true" ]]; then
+            echo "| $name | ✅ PASS |" >> "$temp_table"
+            passed_tests=$((passed_tests + 1))
+        else
+            echo "| $name | ❌ FAIL |" >> "$temp_table"
+            failed_tests=$((failed_tests + 1))
+        fi
     fi
-fi
 done
 
-echo "" >> "$test_summary"
-echo "**Summary:** $passed_tests/$total_tests tests passed" >> "$test_summary"
+{
+    echo ""
+    echo "**Summary:** $passed_tests/$total_tests tests passed"
+} >> "$temp_table"
 
-
-# Generate the summary markdown
+# Generate the final summary markdown
 {
     echo "## Test Results"
     echo ""
     echo "### Passed ✔️: $passed_tests | Failed ❌: $failed_tests"
     echo ""
     echo "#### Tests:"
-    echo "$test_summary"
+    cat "$temp_table"
 } >> "$GITHUB_STEP_SUMMARY"
+
+# Clean up
+rm -f "$temp_table"
