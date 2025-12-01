@@ -159,7 +159,7 @@ jobs:
             "${{ steps.extract-data.outputs.error }}"
 
       - name: Upload test result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-result-extract-data-string-from-file-${{ strategy.job-index }}
