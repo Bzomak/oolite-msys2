@@ -14,12 +14,6 @@
 
 cd oolite || exit
 
-# Revert a change that breaks building with GNUstep on MSYS2
-# This is a commit that identifies the default OS app for opening .log files.
-git fetch --unshallow
-git stash
-git revert --no-commit 0031890efd38021567d4d5a4d28b1418a34768d1
-
 # Comment out Windows version checks in /mingw64/include/wingdi.h
 sed -i '2396 s|^|//|' /mingw64/include/wingdi.h
 sed -i '2447 s|^|//|' /mingw64/include/wingdi.h
