@@ -57,6 +57,8 @@ sed -i '78,82 s/^/#/' Gnumakefile.postamble
 #sed -i '26 s/-I$(WIN_DEPS_DIR)\/include //' GNUMakefile
 # shellcheck disable=SC2016
 #sed -i '27 s/-L$(WIN_DEPS_DIR)\/lib //' GNUMakefile
+#Try keeping -I$(JS_INC_DIR)
+sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 
 # Copy the espeak-data folder
 sed -i '46,54 s/^/#/' Gnumakefile.postamble
