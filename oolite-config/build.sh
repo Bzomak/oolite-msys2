@@ -53,15 +53,16 @@ sed -i '78,82 s/^/#/' Gnumakefile.postamble
 # Keeping -I$(JS_INC_DIR)
 sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 
+# Need to copy the correct dlls to the oolite.app folder
+# Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
+# dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
+sed -i '70 s/^/#/' Gnumakefile.postamble
+
 # Try to build
 # shellcheck source=/dev/null
 . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
 make -j "$(nproc)" -f Makefile "$1"
 
-# Need to copy the correct dlls to the oolite.app folder
-# Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
-# dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
-sed -i '70 s/^/#/' Gnumakefile.postamble
 cd ..
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
