@@ -68,10 +68,10 @@ if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
     # Once we can build it ourselves it can be copied with the other dlls
     cp ./oolite/deps/Windows-deps/x86_64/DLLs/js32ECMAv5.dll ./oolite/oolite.app/
-    ./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.exe
+    ./oolite-config/copy-dlls-loop.sh ./oolite/oolite.app/oolite.exe
 elif [ "$1" = "debug" ]; then
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
     # Once we can build it ourselves it can be copied with the other dlls
     cp ./oolite/deps/Windows-deps/x86_64/DLLs/js32ECMAv5dbg.dll ./oolite/oolite.app/
-    ./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.dbg.exe
+    ./oolite-config/copy-dlls-loop.sh ./oolite/oolite.app/oolite.dbg.exe
 fi

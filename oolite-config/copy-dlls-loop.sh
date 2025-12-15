@@ -1,0 +1,103 @@
+#! /usr/bin/bash
+
+###############################
+#
+# Copy the required dlls to the oolite.app folder
+#
+# Usage: ./copy-dlls-loop.sh [application_name]
+#
+# The script expects to be called by oolite-config/build.sh, being run from the root of the oolite-msys2 repository.
+# It expects Oolite to have been built.
+#
+###############################
+
+# Check if the required argument is provided
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <application_name>"
+    exit 1
+fi
+
+# Store the application name provided as argument
+app_name=$1
+app_location="$(dirname "$app_name")/"
+
+# Initialize variables for loop control
+iteration=1
+prev_dlls=""
+max_iterations=10  # Safety limit to prevent infinite loops
+
+echo "Starting iterative DLL copy process for $app_name"
+echo "Application location: $app_location"
+
+while [ $iteration -le $max_iterations ]; do
+    echo ""
+    echo "=== Iteration $iteration ==="
+    
+    # Get the list of DLLs for the application using 'ldd' command
+    dll_list=$(ldd "$app_name")
+    echo "Checking DLLs for $app_name..."
+    
+    # Filter the DLLs by those in /mingw64/bin
+    filtered_dll_list=$(echo "$dll_list" | grep "/mingw64/bin" | awk '{print $3}' | sort | uniq)
+    
+    if [ -z "$filtered_dll_list" ]; then
+        echo "No DLLs found in directory: /mingw64/bin"
+        break
+    fi
+    
+    echo "DLLs in /mingw64/bin required by $app_name:"
+    echo "$filtered_dll_list"
+    
+    # Check if this is the same as the previous iteration
+    current_dlls="$filtered_dll_list"
+    if [ "$current_dlls" = "$prev_dlls" ]; then
+        echo "No new DLLs found. Copy process complete."
+        break
+    fi
+    
+    # Copy only new DLLs (those not already present in the destination)
+    new_dlls_copied=0
+    for dll in $filtered_dll_list; do
+        dll_basename=$(basename "$dll")
+        if [ ! -f "$app_location$dll_basename" ]; then
+            echo "Copying new DLL: $dll"
+            cp "$dll" "$app_location"
+            new_dlls_copied=$((new_dlls_copied + 1))
+        fi
+    done
+    
+    if [ $new_dlls_copied -eq 0 ]; then
+        echo "All required DLLs are already present. Process complete."
+        break
+    else
+        echo "Copied $new_dlls_copied new DLL(s) in this iteration."
+    fi
+    
+    # Store current state for next comparison
+    prev_dlls="$current_dlls"
+    iteration=$((iteration + 1))
+done
+
+# Check if we hit the safety limit
+if [ $iteration -gt $max_iterations ]; then
+    echo "WARNING: Reached maximum iterations ($max_iterations). There might be circular dependencies or other issues."
+fi
+
+###############################
+
+# Final check - show all DLLs after copying is complete
+echo ""
+echo "=== Final DLL check ==="
+echo "Checking final DLL dependencies for $app_name:"
+final_dll_list=$(ldd "$app_name")
+echo "$final_dll_list"
+
+# Summary
+echo ""
+echo "=== Copy Summary ==="
+total_iterations=$((iteration - 1))
+echo "Completed in $total_iterations iteration(s)"
+echo "DLLs now present in $app_location:"
+ls -1 "$app_location"*.dll 2>/dev/null || echo "No .dll files found in destination"
+
+###############################
