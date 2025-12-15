@@ -49,24 +49,9 @@ sed -i 's|/nsis/makensis.exe|/mingw64/bin/makensis.exe|' Makefile
 # sed needs to comment out lines 78 to 82 in Gnumakefile.postamble
 sed -i '78,82 s/^/#/' Gnumakefile.postamble
 
-# Use pre-build MSYS2 png and openal
-#sed -i '27 s/-lopenal32.dll -lpng14.dll/-lopenal.dll -lpng16.dll/' GNUMakefile
-
-# Remove the oolite-windows-dependencies repo's include & libs folders
 # shellcheck disable=SC2016
-#sed -i '26 s/-I$(WIN_DEPS_DIR)\/include //' GNUMakefile
-# shellcheck disable=SC2016
-#sed -i '27 s/-L$(WIN_DEPS_DIR)\/lib //' GNUMakefile
-#Try keeping -I$(JS_INC_DIR)
+# Keeping -I$(JS_INC_DIR)
 sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
-
-# Copy the espeak-data folder
-#sed -i '46,54 s/^/#/' Gnumakefile.postamble
-#sed -i '56,57 s/^/#/' Gnumakefile.postamble
-#sed -i '61 s/^/#/' Gnumakefile.postamble
-
-# Link to espeak and portaudio
-#sed -i '55 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
 # Try to build
 # shellcheck source=/dev/null
