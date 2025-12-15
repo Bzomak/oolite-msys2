@@ -61,12 +61,12 @@ sed -i '78,82 s/^/#/' Gnumakefile.postamble
 sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 
 # Copy the espeak-data folder
-sed -i '46,54 s/^/#/' Gnumakefile.postamble
-sed -i '56,57 s/^/#/' Gnumakefile.postamble
-sed -i '61 s/^/#/' Gnumakefile.postamble
+#sed -i '46,54 s/^/#/' Gnumakefile.postamble
+#sed -i '56,57 s/^/#/' Gnumakefile.postamble
+#sed -i '61 s/^/#/' Gnumakefile.postamble
 
 # Link to espeak and portaudio
-sed -i '55 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
+#sed -i '55 s/-lespeak.dll/-lespeak -lportaudio.dll/' GNUMakefile
 
 # Try to build
 # shellcheck source=/dev/null

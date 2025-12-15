@@ -14,7 +14,6 @@
 # - build-tools-make: This job checks out the tools-make repository, compiles tools-make, and caches the build.
 # - build-libs-base: This job checks out the libs-base repository, compiles libs-base, and caches the build.
 # - build-sdl: This job downloads and compiles SDL, and caches the build.
-# - build-espeak: This job downloads and compiles eSpeak, and caches the build.
 # - test-libs-base: This job uses the cache from the successful build-libs-base job and runs the tests on the built library.
 # - test-sdl: This job uses the cache from the successful build-sdl job and runs the tests on the built library
 # - clear-oolite-caches: This job deletes any caches created by the build-oolite job.
@@ -72,7 +71,7 @@ jobs:
   build-oolite:
     name: Build Oolite
     runs-on: windows-latest
-    needs: [build-tools-make, build-libs-base, build-sdl, build-espeak]
+    needs: [build-tools-make, build-libs-base, build-sdl]
     defaults:
       run:
         shell: msys2 {0}
@@ -114,14 +113,6 @@ jobs:
           key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
           install_script: ./deps/sdl/install.sh
 
-      - name: Install built version of eSpeak from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          install_script: ./deps/eSpeak/install.sh
-
       - name: Checkout Oolite
         uses: actions/checkout@v6
         with:
@@ -147,7 +138,7 @@ jobs:
   build-oolite-installers:
     name: Build Oolite installers
     runs-on: windows-latest
-    needs: [build-tools-make, build-libs-base, build-sdl, build-espeak, build-oolite, generate-pdfs]
+    needs: [build-tools-make, build-libs-base, build-sdl, build-oolite, generate-pdfs]
     defaults:
       run:
         shell: msys2 {0}
@@ -188,14 +179,6 @@ jobs:
           path: SDL-1.2.13
           key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
           install_script: ./deps/sdl/install.sh
-
-      - name: Install built version of eSpeak from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          install_script: ./deps/eSpeak/install.sh
 
       - name: Retrieve Oolite cache
         id: restore-oolite
@@ -408,63 +391,6 @@ jobs:
           name: SDL
           path: SDL-1.2.13
           key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
-          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
-
-########################################
-
-  build-espeak:
-    name: Build eSpeak
-    runs-on: windows-latest
-    needs: [check-oolite-ref]
-    defaults:
-      run:
-        shell: msys2 {0}
-    env:
-      ESPEAK_VERSION:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v6
-
-      - name: Load dependency data into env
-        shell: bash
-        run: |
-          echo ESPEAK_VERSION=$(cat deps/espeak/version) >> $GITHUB_ENV
-
-      - name: Check cache status
-        id: cache-status
-        uses: ./.github/actions/early-exit-if-cache-exists
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          from_fresh: ${{ inputs.from_fresh }}
-
-      - name: Set up msys2
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        uses: ./.github/actions/start-msys2-with-deps
-        with:
-          deps_path: deps/espeak/msys2-deps
-
-      - name: Download and extract eSpeak
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        run: |
-          wget ${{ env.ESPEAK_VERSION }}
-          unzip espeak-1.43.03-source.zip
-
-      - name: Configure and build eSpeak
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        run: |
-          bash ./deps/espeak/build.sh
-
-      - name: Cache eSpeak build
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        uses: ./.github/actions/cache-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
           delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################

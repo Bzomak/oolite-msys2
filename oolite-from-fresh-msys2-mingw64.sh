@@ -138,19 +138,6 @@ tar -xf SDL-1.2.13.tar.gz
 
 ###############################
 
-# Install build dependencies for eSpeak
-read -r -a ESPEAK_MSYS2_DEPS <<< "$(cat ./deps/espeak/msys2-deps)"
-pacman -S --noconfirm --needed "${ESPEAK_MSYS2_DEPS[@]}"
-
-# Download SDL and extract from tarball
-ESPEAK_VERSION=$(cat ./deps/espeak/version)
-wget "$ESPEAK_VERSION"
-unzip espeak-1.43.03-source.zip
-
-# Make and install SDL
-./deps/espeak/build.sh
-./deps/espeak/install.sh
-
 # Install build dependencies for Oolite
 # Some of these are already installed, but we're reusing the list from the build Oolite job on GitHub Actions
 
