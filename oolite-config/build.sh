@@ -59,15 +59,18 @@ sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 make -j "$(nproc)" -f Makefile "$1"
 
 # Need to copy the correct dlls to the oolite.app folder
+# Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
+# dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
+sed -i '70 s/^/#/' Gnumakefile.postamble
 cd ..
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
     # Once we can build it ourselves it can be copied with the other dlls
     cp ./oolite/deps/Windows-deps/x86_64/DLLs/js32ECMAv5.dll ./oolite/oolite.app/
-    #./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.exe
+    ./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.exe
 elif [ "$1" = "debug" ]; then
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
     # Once we can build it ourselves it can be copied with the other dlls
     cp ./oolite/deps/Windows-deps/x86_64/DLLs/js32ECMAv5dbg.dll ./oolite/oolite.app/
-    #./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.dbg.exe
+    ./oolite-config/copy-dlls.sh ./oolite/oolite.app/oolite.dbg.exe
 fi
