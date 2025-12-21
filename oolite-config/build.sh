@@ -4,7 +4,7 @@
 #
 # Configure and build Oolite
 #
-# Usage: ./build.sh [debug|release|release-deployment|release-snapshot]
+# Usage: ./build.sh [debug|release|release-deployment|release-snapshot] [MINGW64|CLANG64]
 #
 # The script expects to be run from the root of the oolite-msys2 repository.
 # It expects tools-make, libs-base, and SDL to be downloaded and installed.
@@ -14,9 +14,21 @@
 
 cd oolite || exit
 
-# Comment out Windows version checks in /mingw64/include/wingdi.h
-sed -i '2396 s|^|//|' /mingw64/include/wingdi.h
-sed -i '2447 s|^|//|' /mingw64/include/wingdi.h
+msystem=$2
+build_system=""
+
+if [ "$msystem" = "MINGW64" ]; then
+    build_system="mingw64"
+elif [ "$msystem" = "CLANG64" ]; then
+    build_system="clang64"
+else
+    echo "Invalid or missing MSYSTEM argument. Use MINGW64 or CLANG64."
+    exit 1
+fi
+
+# Comment out Windows version checks in /$build_system/include/wingdi.h
+sed -i '2396 s|^|//|' /$build_system/include/wingdi.h
+sed -i '2447 s|^|//|' /$build_system/include/wingdi.h
 
 # Add -fobjc-exceptions and -fcommon to OBJC flags in GNUMakefile, line 36
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
@@ -43,7 +55,7 @@ sed -i '271 s/release-snapshot //' Makefile
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
 # Stop the installer from rebuilding Oolite
-sed -i 's|/nsis/makensis.exe|/mingw64/bin/makensis.exe|' Makefile
+sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
 
 # Don't copy js dll here yet until we can build it ourselves.
 # sed needs to comment out lines 78 to 82 in Gnumakefile.postamble
@@ -60,7 +72,7 @@ sed -i '70 s/^/#/' Gnumakefile.postamble
 
 # Try to build
 # shellcheck source=/dev/null
-. /mingw64/share/GNUstep/Makefiles/GNUstep.sh
+. /$build_system/share/GNUstep/Makefiles/GNUstep.sh
 make -j "$(nproc)" -f Makefile "$1"
 
 cd ..

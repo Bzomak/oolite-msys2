@@ -148,7 +148,7 @@ pacman -S --noconfirm --needed "${OOLITE_MSYS2_DEPS[@]}"
 git clone --recursive https://github.com/OoliteProject/oolite.git --branch="$GIT_REF"
 
 # Now let's try to compile Oolite
-./oolite-config/build.sh "$BUILD_TYPE"
+./oolite-config/build.sh "$BUILD_TYPE" "MINGW64"
 
 ###############################
 ###############################

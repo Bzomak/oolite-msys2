@@ -127,7 +127,7 @@ jobs:
 
       - name: Configure and build Oolite
         run: |
-          bash ./oolite-config/build.sh ${{ matrix.build_type }}
+          bash ./oolite-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
 
       - name: Cache Oolite build
         uses: actions/cache/save@v4
@@ -204,7 +204,7 @@ jobs:
 
       - name: Build installers
         run: |
-          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }}
+          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
 
       - name: Upload Oolite installers as artifacts
         uses: actions/upload-artifact@v5
