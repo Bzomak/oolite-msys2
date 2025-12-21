@@ -13,7 +13,7 @@
 patch -s -d SDL-1.2.13 -p1 < ./deps/sdl/OOSDLdll_x64.patch
 cd SDL-1.2.13 || exit
 ./autogen.sh
-./configure -- disable-assembly
+./configure --disable-assembly
 # Add flags back that configure seems to remove
 sed -i '/^EXTRA_LDFLAGS/ s/$/ -ldxerr8 -ldinput8 -lole32/' Makefile
 sed -i '/^CFLAGS/ s/$/ -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types/' Makefile
