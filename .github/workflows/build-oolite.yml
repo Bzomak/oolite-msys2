@@ -1,5 +1,5 @@
 # Workflow to compile Oolite and necessary dependencies
-# It is designed to be run on a Windows runner and uses MSYS2-MINGW64 to compile Oolite.
+# It is designed to be run on a Windows runner and uses MSYS2 environments (e.g., MINGW64, CLANG64) to compile Oolite.
 
 # This workflow is can be triggered by a workflow_call event when called by other workflows.
 # It can also be called by a workflow_dispatch event from GitHub.
@@ -21,7 +21,7 @@
 # - generate-pdfs: This job generates the PDFs of the Oolite documentation .odt files in the oolite/Doc/ folder.
 # - check-oolite-ref: This job checks if the provided ref exists in the Oolite repository. Commit hashes are not yet supported.
 
-name: Build Oolite on MSYS2-MINGW64
+name: Build Oolite on MSYS2 environments
 on: 
   workflow_call:
     inputs:
@@ -78,6 +78,7 @@ jobs:
     strategy:
       matrix:
         build_type: [debug, release, release-deployment, release-snapshot]
+        msystem: [MINGW64, CLANG64]
       fail-fast: false
 
     steps:
@@ -87,7 +88,8 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: oolite-config/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: oolite-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
         uses: ./.github/actions/install-built-dependency
@@ -129,7 +131,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: oolite
-          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}
+          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
 
 ########################################
 
@@ -144,6 +146,7 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
+        msystem: [MINGW64, CLANG64]
         build_type: [release, release-deployment, release-snapshot]
       fail-fast: false
 
@@ -154,7 +157,8 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: oolite-installer-config/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: oolite-installer-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
         uses: ./.github/actions/install-built-dependency
@@ -185,7 +189,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: oolite
-          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}
+          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
           fail-on-cache-miss: true
 
       - name: Retrieve pdfs artifact
@@ -201,7 +205,7 @@ jobs:
       - name: Upload Oolite installers as artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: oolite-${{ matrix.build_type }}.exe
+          name: oolite-${{ matrix.build_type }}-${{ matrix.msystem }}.exe
           path: |
             oolite/installers/win32/OoliteInstall*.exe
 
