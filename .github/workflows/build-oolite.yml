@@ -92,6 +92,7 @@ jobs:
           deps_path: oolite-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make
@@ -100,6 +101,7 @@ jobs:
           install_script: ./deps/tools-make/install.sh
 
       - name: Install built version of libs-base from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: libs-base
@@ -161,6 +163,7 @@ jobs:
           deps_path: oolite-installer-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make
@@ -169,6 +172,7 @@ jobs:
           install_script: ./deps/tools-make/install.sh
 
       - name: Install built version of libs-base from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: libs-base
