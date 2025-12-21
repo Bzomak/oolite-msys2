@@ -59,16 +59,14 @@ sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
 
 # Don't copy js dll here yet until we can build it ourselves.
 # sed needs to comment out lines 78 to 82 in Gnumakefile.postamble
-sed -i '78,82 s/^/#/' Gnumakefile.postamble
+# Need to copy the correct dlls to the oolite.app folder
+# Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
+# dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
+sed -i '86,101 s/^/#/' Gnumakefile.postamble
 
 # shellcheck disable=SC2016
 # Keeping -I$(JS_INC_DIR)
 sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
-
-# Need to copy the correct dlls to the oolite.app folder
-# Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
-# dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
-sed -i '70 s/^/#/' Gnumakefile.postamble
 
 # Try to build
 # shellcheck source=/dev/null
