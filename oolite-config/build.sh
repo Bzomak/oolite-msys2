@@ -52,9 +52,11 @@ sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble
 sed -i '281 s/release //' Makefile
 sed -i '285 s/release-deployment //' Makefile
 sed -i '290 s/release-snapshot //' Makefile
-sed -i 's/pkg-win/pkg-win-release/' Makefile
 
 # Rename targets to make clear what they do
+sed -i 's/pkg-win/pkg-win-release/' Makefile
+
+# Replace nsis path with correct one 
 sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
 
 # Don't copy js dll here yet until we can build it ourselves.
