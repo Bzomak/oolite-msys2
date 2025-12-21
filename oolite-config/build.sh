@@ -48,13 +48,13 @@ sed -i '122 s/objc.make/tool.make/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble 
 
-# Rename targets to make clear what they do
-sed -i '262 s/release //' Makefile
-sed -i '266 s/release-deployment //' Makefile
-sed -i '271 s/release-snapshot //' Makefile
+# Stop the installer from rebuilding Oolite
+sed -i '281 s/release //' Makefile
+sed -i '285 s/release-deployment //' Makefile
+sed -i '290 s/release-snapshot //' Makefile
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
-# Stop the installer from rebuilding Oolite
+# Rename targets to make clear what they do
 sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
 
 # Don't copy js dll here yet until we can build it ourselves.
