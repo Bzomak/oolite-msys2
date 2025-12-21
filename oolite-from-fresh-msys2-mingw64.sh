@@ -124,7 +124,7 @@ cd ..
 ###############################
 
 # Install build dependencies for SDL
-read -r -a SDL_MSYS2_DEPS <<< "$(cat ./deps/sdl/msys2-deps)"
+read -r -a SDL_MSYS2_DEPS <<< "$(cat ./deps/sdl/msys2-deps-MINGW64)"
 pacman -S --noconfirm --needed "${SDL_MSYS2_DEPS[@]}"
 
 # Download SDL and extract from tarball

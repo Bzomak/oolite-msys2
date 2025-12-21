@@ -112,7 +112,7 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
 
       - name: Checkout Oolite
@@ -181,7 +181,7 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
 
       - name: Retrieve Oolite cache
@@ -349,6 +349,10 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [MINGW64, CLANG64]
+      fail-fast: false
     env:
       SDL_VERSION:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -368,14 +372,15 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           from_fresh: ${{ inputs.from_fresh }}
 
       - name: Set up msys2
         if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: deps/sdl/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: deps/sdl/msys2-deps-${{ matrix.msystem }}
 
       - name: Download and extract SDL
         if: steps.cache-status.outputs.early_exit != 'skip'
@@ -394,7 +399,7 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
@@ -461,6 +466,10 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [MINGW64, CLANG64]
+      fail-fast: false
 
     steps:
       - name: Checkout this repository
@@ -469,14 +478,14 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: deps/sdl/msys2-deps
+          deps_path: deps/sdl/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of SDL from cache
         uses: ./.github/actions/install-built-dependency
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
 
       - name: Build SDL tests
