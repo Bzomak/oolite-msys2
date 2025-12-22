@@ -53,7 +53,7 @@ while [ $iteration -le $max_iterations ]; do
     echo ""
     
     # Filter the DLLs by those in /$build_system/bin
-    filtered_dll_list=$(echo "$dll_list" | grep "/$build_system/bin" | awk '{print $3}' | sort | uniq)
+    filtered_dll_list=$(echo "$dll_list" | grep "\\$build_system\\bin" | awk '{print $3}' | sort | uniq)
     
     if [ -z "$filtered_dll_list" ]; then
         echo "No DLLs found in directory: /$build_system/bin"
@@ -104,7 +104,7 @@ fi
 echo ""
 echo "=== Final DLL check ==="
 echo "Checking final DLL dependencies for $app_name:"
-final_dll_list=$(ldd "$app_name")
+final_dll_list=$(ntldd -R "$app_name")
 echo "$final_dll_list"
 
 # Summary
