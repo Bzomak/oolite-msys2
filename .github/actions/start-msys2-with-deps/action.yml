@@ -3,6 +3,10 @@
 name: Start MSYS2 with dependencies
 description: Start MSYS2 with dependencies
 inputs:
+  msystem:
+    description: The MSYS2 system to use (e.g., MINGW64, CLANG64, UCRT64, etc.)
+    required: false
+    default: MINGW64
   deps_path:
     description: Path to the file containing the dependencies data
     required: true
@@ -19,6 +23,6 @@ runs:
     - name: Start MSYS2 with dependencies
       uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
+        msystem: ${{ inputs.msystem }}
         update: true
         install: ${{ steps.extract-deps.outputs.data }}

@@ -1,5 +1,5 @@
 # Workflow to compile Oolite and necessary dependencies
-# It is designed to be run on a Windows runner and uses MSYS2-MINGW64 to compile Oolite.
+# It is designed to be run on a Windows runner and uses MSYS2 environments (e.g., MINGW64, CLANG64) to compile Oolite.
 
 # This workflow is can be triggered by a workflow_call event when called by other workflows.
 # It can also be called by a workflow_dispatch event from GitHub.
@@ -14,7 +14,6 @@
 # - build-tools-make: This job checks out the tools-make repository, compiles tools-make, and caches the build.
 # - build-libs-base: This job checks out the libs-base repository, compiles libs-base, and caches the build.
 # - build-sdl: This job downloads and compiles SDL, and caches the build.
-# - build-espeak: This job downloads and compiles eSpeak, and caches the build.
 # - test-libs-base: This job uses the cache from the successful build-libs-base job and runs the tests on the built library.
 # - test-sdl: This job uses the cache from the successful build-sdl job and runs the tests on the built library
 # - clear-oolite-caches: This job deletes any caches created by the build-oolite job.
@@ -22,7 +21,7 @@
 # - generate-pdfs: This job generates the PDFs of the Oolite documentation .odt files in the oolite/Doc/ folder.
 # - check-oolite-ref: This job checks if the provided ref exists in the Oolite repository. Commit hashes are not yet supported.
 
-name: Build Oolite on MSYS2-MINGW64
+name: Build Oolite on MSYS2 environments
 on: 
   workflow_call:
     inputs:
@@ -72,13 +71,14 @@ jobs:
   build-oolite:
     name: Build Oolite
     runs-on: windows-latest
-    needs: [build-tools-make, build-libs-base, build-sdl, build-espeak]
+    needs: [build-tools-make, build-libs-base, build-sdl]
     defaults:
       run:
         shell: msys2 {0}
     strategy:
       matrix:
         build_type: [debug, release, release-deployment, release-snapshot]
+        msystem: [MINGW64, CLANG64]
       fail-fast: false
 
     steps:
@@ -88,9 +88,11 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: oolite-config/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: oolite-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make
@@ -99,6 +101,7 @@ jobs:
           install_script: ./deps/tools-make/install.sh
 
       - name: Install built version of libs-base from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: libs-base
@@ -111,16 +114,8 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
-
-      - name: Install built version of eSpeak from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          install_script: ./deps/eSpeak/install.sh
 
       - name: Checkout Oolite
         uses: actions/checkout@v6
@@ -132,13 +127,13 @@ jobs:
 
       - name: Configure and build Oolite
         run: |
-          bash ./oolite-config/build.sh ${{ matrix.build_type }}
+          bash ./oolite-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
 
       - name: Cache Oolite build
         uses: actions/cache/save@v4
         with:
           path: oolite
-          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}
+          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
 
 ########################################
 
@@ -147,12 +142,13 @@ jobs:
   build-oolite-installers:
     name: Build Oolite installers
     runs-on: windows-latest
-    needs: [build-tools-make, build-libs-base, build-sdl, build-espeak, build-oolite, generate-pdfs]
+    needs: [build-tools-make, build-libs-base, build-sdl, build-oolite, generate-pdfs]
     defaults:
       run:
         shell: msys2 {0}
     strategy:
       matrix:
+        msystem: [MINGW64, CLANG64]
         build_type: [release, release-deployment, release-snapshot]
       fail-fast: false
 
@@ -163,9 +159,11 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: oolite-installer-config/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: oolite-installer-config/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of tools-make from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: tools-make
@@ -174,6 +172,7 @@ jobs:
           install_script: ./deps/tools-make/install.sh
 
       - name: Install built version of libs-base from cache
+        if: ${{ matrix.msystem == 'MINGW64' }}
         uses: ./.github/actions/install-built-dependency
         with:
           name: libs-base
@@ -186,23 +185,15 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
-
-      - name: Install built version of eSpeak from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          install_script: ./deps/eSpeak/install.sh
 
       - name: Retrieve Oolite cache
         id: restore-oolite
         uses: actions/cache/restore@v4
         with:
           path: oolite
-          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}
+          key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
           fail-on-cache-miss: true
 
       - name: Retrieve pdfs artifact
@@ -213,12 +204,12 @@ jobs:
 
       - name: Build installers
         run: |
-          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }}
+          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
 
       - name: Upload Oolite installers as artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: oolite-${{ matrix.build_type }}.exe
+          name: oolite-${{ matrix.build_type }}-${{ matrix.msystem }}.exe
           path: |
             oolite/installers/win32/OoliteInstall*.exe
 
@@ -362,6 +353,10 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [MINGW64, CLANG64]
+      fail-fast: false
     env:
       SDL_VERSION:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -381,14 +376,15 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           from_fresh: ${{ inputs.from_fresh }}
 
       - name: Set up msys2
         if: steps.cache-status.outputs.early_exit != 'skip'
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: deps/sdl/msys2-deps
+          msystem: ${{ matrix.msystem }}
+          deps_path: deps/sdl/msys2-deps-${{ matrix.msystem }}
 
       - name: Download and extract SDL
         if: steps.cache-status.outputs.early_exit != 'skip'
@@ -407,64 +403,7 @@ jobs:
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
-          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
-
-########################################
-
-  build-espeak:
-    name: Build eSpeak
-    runs-on: windows-latest
-    needs: [check-oolite-ref]
-    defaults:
-      run:
-        shell: msys2 {0}
-    env:
-      ESPEAK_VERSION:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v6
-
-      - name: Load dependency data into env
-        shell: bash
-        run: |
-          echo ESPEAK_VERSION=$(cat deps/espeak/version) >> $GITHUB_ENV
-
-      - name: Check cache status
-        id: cache-status
-        uses: ./.github/actions/early-exit-if-cache-exists
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
-          from_fresh: ${{ inputs.from_fresh }}
-
-      - name: Set up msys2
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        uses: ./.github/actions/start-msys2-with-deps
-        with:
-          deps_path: deps/espeak/msys2-deps
-
-      - name: Download and extract eSpeak
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        run: |
-          wget ${{ env.ESPEAK_VERSION }}
-          unzip espeak-1.43.03-source.zip
-
-      - name: Configure and build eSpeak
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        run: |
-          bash ./deps/espeak/build.sh
-
-      - name: Cache eSpeak build
-        if: steps.cache-status.outputs.early_exit != 'skip'
-        uses: ./.github/actions/cache-built-dependency
-        with:
-          name: eSpeak
-          path: espeak-1.43.03-source
-          key: cache-espeak-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/espeak/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
@@ -531,6 +470,10 @@ jobs:
     defaults:
       run:
         shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [MINGW64, CLANG64]
+      fail-fast: false
 
     steps:
       - name: Checkout this repository
@@ -539,14 +482,14 @@ jobs:
       - name: Set up msys2
         uses: ./.github/actions/start-msys2-with-deps
         with:
-          deps_path: deps/sdl/msys2-deps
+          deps_path: deps/sdl/msys2-deps-${{ matrix.msystem }}
 
       - name: Install built version of SDL from cache
         uses: ./.github/actions/install-built-dependency
         with:
           name: SDL
           path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}
+          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
           install_script: ./deps/sdl/install.sh
 
       - name: Build SDL tests

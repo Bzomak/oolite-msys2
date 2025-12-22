@@ -124,7 +124,7 @@ cd ..
 ###############################
 
 # Install build dependencies for SDL
-read -r -a SDL_MSYS2_DEPS <<< "$(cat ./deps/sdl/msys2-deps)"
+read -r -a SDL_MSYS2_DEPS <<< "$(cat ./deps/sdl/msys2-deps-MINGW64)"
 pacman -S --noconfirm --needed "${SDL_MSYS2_DEPS[@]}"
 
 # Download SDL and extract from tarball
@@ -138,30 +138,17 @@ tar -xf SDL-1.2.13.tar.gz
 
 ###############################
 
-# Install build dependencies for eSpeak
-read -r -a ESPEAK_MSYS2_DEPS <<< "$(cat ./deps/espeak/msys2-deps)"
-pacman -S --noconfirm --needed "${ESPEAK_MSYS2_DEPS[@]}"
-
-# Download SDL and extract from tarball
-ESPEAK_VERSION=$(cat ./deps/espeak/version)
-wget "$ESPEAK_VERSION"
-unzip espeak-1.43.03-source.zip
-
-# Make and install SDL
-./deps/espeak/build.sh
-./deps/espeak/install.sh
-
 # Install build dependencies for Oolite
 # Some of these are already installed, but we're reusing the list from the build Oolite job on GitHub Actions
 
-read -r -a OOLITE_MSYS2_DEPS <<< "$(cat ./oolite-config/msys2-deps)"
+read -r -a OOLITE_MSYS2_DEPS <<< "$(cat ./oolite-config/msys2-deps-MINGW64)"
 pacman -S --noconfirm --needed "${OOLITE_MSYS2_DEPS[@]}"
 
 # Clone Oolite repo and submodules
 git clone --recursive https://github.com/OoliteProject/oolite.git --branch="$GIT_REF"
 
 # Now let's try to compile Oolite
-./oolite-config/build.sh "$BUILD_TYPE"
+./oolite-config/build.sh "$BUILD_TYPE" "MINGW64"
 
 ###############################
 ###############################
