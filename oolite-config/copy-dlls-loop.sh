@@ -42,13 +42,17 @@ echo "Starting iterative DLL copy process for $app_name"
 echo "Application location: $app_location"
 
 echo ""
-objdump_list=$(objdump -p "$app_name" | grep 'DLL Name')
+objdump_list=$(objdump -p "$app_name")
 echo "DLLs according to objdump:"
 echo "$objdump_list"
 echo ""
 ntldd_list=$(ntldd -R "$app_name")
 echo "DLLs according to ntldd:"
 echo "$ntldd_list"
+echo ""
+dll_list=$(ldd "$app_name")
+echo "DLLs according to ldd:"
+echo "$dll_list"
 echo ""
 
 while [ $iteration -le $max_iterations ]; do
