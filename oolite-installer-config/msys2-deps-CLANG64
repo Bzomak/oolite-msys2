@@ -1,1 +1,15 @@
-base-devel mingw-w64-clang-x86_64-clang git mingw-w64-clang-x86_64-libobjc2 mingw-w64-clang-x86_64-libffi mingw-w64-clang-x86_64-libxml2 mingw-w64-clang-x86_64-icu mingw-w64-clang-x86_64-libpng mingw-w64-clang-x86_64-libvorbis mingw-w64-clang-x86_64-portaudio mingw-w64-clang-x86_64-openal mingw-w64-clang-x86_64-nsis mingw-w64-clang-x86_64-espeak-ng  mingw-w64-clang-x86_64-gnustep-make mingw-w64-clang-x86_64-gnustep-base
+base-devel
+mingw-w64-clang-x86_64-clang
+git
+mingw-w64-clang-x86_64-libobjc2
+mingw-w64-clang-x86_64-libffi
+mingw-w64-clang-x86_64-libxml2
+mingw-w64-clang-x86_64-icu
+mingw-w64-clang-x86_64-libpng
+mingw-w64-clang-x86_64-libvorbis
+mingw-w64-clang-x86_64-portaudio
+mingw-w64-clang-x86_64-openal
+mingw-w64-clang-x86_64-nsis
+mingw-w64-clang-x86_64-espeak-ng
+mingw-w64-clang-x86_64-gnustep-make
+mingw-w64-clang-x86_64-gnustep-base
