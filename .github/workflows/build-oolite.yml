@@ -130,7 +130,7 @@ jobs:
           bash ./oolite-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
 
       - name: Cache Oolite build
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: oolite
           key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
@@ -190,7 +190,7 @@ jobs:
 
       - name: Retrieve Oolite cache
         id: restore-oolite
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: oolite
           key: cache-oolite-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.build_type }}-${{ matrix.msystem }}
