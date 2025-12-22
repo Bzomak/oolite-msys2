@@ -178,7 +178,7 @@ jobs:
 
       - name: Build installers
         run: |
-          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
+          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }}
 
       - name: Upload Oolite installers as artifacts
         uses: actions/upload-artifact@v6
