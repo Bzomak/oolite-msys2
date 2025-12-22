@@ -48,6 +48,9 @@ while [ $iteration -le $max_iterations ]; do
     # Get the list of DLLs for the application using 'ldd' command
     dll_list=$(ntldd -R "$app_name")
     echo "Checking DLLs for $app_name..."
+    echo "Full DLL list:"
+    echo "$dll_list"
+    echo ""
     
     # Filter the DLLs by those in /$build_system/bin
     filtered_dll_list=$(echo "$dll_list" | grep "/$build_system/bin" | awk '{print $3}' | sort | uniq)
