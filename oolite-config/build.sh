@@ -51,9 +51,6 @@ sed -i 's/objc.make/tool.make/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble 
 
-# Rename targets to make clear what they do
-sed -i 's/pkg-win/pkg-win-release/' Makefile
-
 ###############################
 
 # Fix inability to find js lib
