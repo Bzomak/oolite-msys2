@@ -35,8 +35,9 @@ echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
 
 # Comment out Windows version checks in /$build_system/include/wingdi.h
 # This allows building with the HDR code on older versions of Windows.
-sed -i '2396 s|^|//|' "/$build_system/include/wingdi.h"
-sed -i '2447 s|^|//|' "/$build_system/include/wingdi.h"
+# Only comment out if not already commented
+sed -i '2396 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
+sed -i '2447 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
 
 # Add -fobjc-exceptions and -fcommon to OBJC flags in GNUMakefile, line 36
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
