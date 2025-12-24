@@ -14,24 +14,29 @@
 
 cd oolite || exit
 
-msystem=$2
-build_system=""
-
-if [ "$msystem" = "MINGW64" ]; then
-    build_system="mingw64"
-elif [ "$msystem" = "CLANG64" ]; then
-    build_system="clang64"
-else
-    echo "Invalid or missing MSYSTEM argument. Use MINGW64 or CLANG64."
+# Check if MINGW_PREFIX is set
+if [ -z "$MINGW_PREFIX" ]; then
+    echo "Error: MINGW_PREFIX is not set."
+    echo "This script must be run from an MSYS2 MINGW64 or CLANG64 environment."
     exit 1
 fi
 
-echo "Checking MINGW_PREFIX: $MINGW_PREFIX"
+# Extract build system from MINGW_PREFIX (e.g., /mingw64 -> mingw64)
+build_system=$(basename "$MINGW_PREFIX")
+
+# Validate build system
+if [ "$build_system" != "mingw64" ] && [ "$build_system" != "clang64" ]; then
+    echo "Error: Unsupported MINGW_PREFIX: $MINGW_PREFIX"
+    echo "Expected /mingw64 or /clang64"
+    exit 1
+fi
+
+echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
 
 # Comment out Windows version checks in /$build_system/include/wingdi.h
 # This allows building with the HDR code on older versions of Windows.
-sed -i '2396 s|^|//|' /$build_system/include/wingdi.h
-sed -i '2447 s|^|//|' /$build_system/include/wingdi.h
+sed -i '2396 s|^|//|' "/$build_system/include/wingdi.h"
+sed -i '2447 s|^|//|' "/$build_system/include/wingdi.h"
 
 # Add -fobjc-exceptions and -fcommon to OBJC flags in GNUMakefile, line 36
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
@@ -67,7 +72,7 @@ sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 
 # Try to build
 # shellcheck source=/dev/null
-. /$build_system/share/GNUstep/Makefiles/GNUstep.sh
+. "/$build_system/share/GNUstep/Makefiles/GNUstep.sh"
 make -j "$(nproc)" -f Makefile "$1"
 
 cd ..

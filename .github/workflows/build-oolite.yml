@@ -127,7 +127,7 @@ jobs:
 
       - name: Configure and build Oolite
         run: |
-          bash ./oolite-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
+          bash ./oolite-config/build.sh ${{ matrix.build_type }}
 
       - name: Cache Oolite build
         uses: actions/cache/save@v5
