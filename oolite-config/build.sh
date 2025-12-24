@@ -52,7 +52,8 @@ sed -i '30 s/^#//' GNUMakefile
 sed -i '48 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
 
 # Use tool.make instead of objc.make
-sed -i '122 s/objc.make/tool.make/' GNUMakefile
+# objc.make was deprecated in favour of tool.make in version 2.6.0 of GNUstep Make.
+sed -i 's/objc.make/tool.make/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble 
 
