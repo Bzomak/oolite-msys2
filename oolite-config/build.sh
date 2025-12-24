@@ -27,6 +27,7 @@ else
 fi
 
 # Comment out Windows version checks in /$build_system/include/wingdi.h
+# This allows building with the HDR code on older versions of Windows.
 sed -i '2396 s|^|//|' /$build_system/include/wingdi.h
 sed -i '2447 s|^|//|' /$build_system/include/wingdi.h
 
@@ -55,7 +56,7 @@ sed -i 's/pkg-win/pkg-win-release/' Makefile
 sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
 
 # Don't copy js dll here yet until we can build it ourselves.
-# sed needs to comment out lines 78 to 82 in Gnumakefile.postamble
+# sed needs to comment out lines 86 to 101 in Gnumakefile.postamble
 # Need to copy the correct dlls to the oolite.app folder
 # Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
 # dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
@@ -71,6 +72,10 @@ sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 make -j "$(nproc)" -f Makefile "$1"
 
 cd ..
+# Temporary fix: copy nspr4.dll to oolite.app folder until we build the js lib ourselves.
+# Then we can use the MSYS2 provided nspr lib instead.
+# A debug build needs the debug javascript dll rather than the regular version.
+# The debug executable is oolite.dbg.exe, not oolite.exe
 cp ./oolite/deps/Windows-deps/x86_64/DLLs/nspr4.dll ./oolite/oolite.app/
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     # Copy the js lib from the oolite-windows-dependencies repo to the oolite.app folder
