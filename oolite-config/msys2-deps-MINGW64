@@ -1,1 +1,13 @@
-base-devel git mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-libffi mingw-w64-x86_64-libxml2 mingw-w64-x86_64-icu mingw-w64-x86_64-libpng mingw-w64-x86_64-libvorbis mingw-w64-x86_64-portaudio mingw-w64-x86_64-openal mingw-w64-x86_64-espeak-ng
+make
+git
+mingw-w64-x86_64-gcc-objc
+mingw-w64-x86_64-ntldd
+mingw-w64-x86_64-espeak-ng
+mingw-w64-x86_64-gnutls
+mingw-w64-x86_64-icu
+mingw-w64-x86_64-libffi
+mingw-w64-x86_64-libpng
+mingw-w64-x86_64-libvorbis
+mingw-w64-x86_64-libxml2
+mingw-w64-x86_64-nspr
+mingw-w64-x86_64-openal

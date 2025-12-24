@@ -162,32 +162,6 @@ jobs:
           msystem: ${{ matrix.msystem }}
           deps_path: oolite-installer-config/msys2-deps-${{ matrix.msystem }}
 
-      - name: Install built version of tools-make from cache
-        if: ${{ matrix.msystem == 'MINGW64' }}
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: tools-make
-          path: tools-make
-          key: cache-tools-make-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/tools-make/*') }}
-          install_script: ./deps/tools-make/install.sh
-
-      - name: Install built version of libs-base from cache
-        if: ${{ matrix.msystem == 'MINGW64' }}
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: libs-base
-          path: libs-base
-          key: cache-libs-base-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/libs-base/*', '**/deps/tools-make/*') }}
-          install_script: ./deps/libs-base/install.sh
-
-      - name: Install built version of SDL from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: SDL
-          path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
-          install_script: ./deps/sdl/install.sh
-
       - name: Retrieve Oolite cache
         id: restore-oolite
         uses: actions/cache/restore@v5
@@ -204,7 +178,7 @@ jobs:
 
       - name: Build installers
         run: |
-          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
+          bash ./oolite-installer-config/build.sh ${{ matrix.build_type }}
 
       - name: Upload Oolite installers as artifacts
         uses: actions/upload-artifact@v6

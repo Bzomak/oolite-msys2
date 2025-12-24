@@ -21,6 +21,7 @@ fi
 app_name=$1
 app_location="$(dirname "$app_name")/"
 
+# Get the MSYS2 Environment
 msystem=$2
 build_system=""
 
@@ -46,18 +47,21 @@ while [ $iteration -le $max_iterations ]; do
     echo "=== Iteration $iteration ==="
     
     # Get the list of DLLs for the application using 'ldd' command
-    dll_list=$(ldd "$app_name")
+    dll_list=$(ntldd -R "$app_name")
     echo "Checking DLLs for $app_name..."
+    echo "Full DLL list:"
+    echo "$dll_list"
+    echo ""
     
     # Filter the DLLs by those in /$build_system/bin
-    filtered_dll_list=$(echo "$dll_list" | grep "/$build_system/bin" | awk '{print $3}' | sort | uniq)
+    filtered_dll_list=$(echo "$dll_list" | grep "\\\\$build_system\\\\bin" | awk '{print $3}' | sort -u)
     
     if [ -z "$filtered_dll_list" ]; then
         echo "No DLLs found in directory: /$build_system/bin"
         break
     fi
     
-    echo "DLLs in /$build_system/bin required by $app_name:"
+    echo "Filtered DLLs in directory /$build_system/bin used by $app_name:"
     echo "$filtered_dll_list"
     
     # Check if this is the same as the previous iteration
@@ -101,7 +105,7 @@ fi
 echo ""
 echo "=== Final DLL check ==="
 echo "Checking final DLL dependencies for $app_name:"
-final_dll_list=$(ldd "$app_name")
+final_dll_list=$(ntldd -R "$app_name")
 echo "$final_dll_list"
 
 # Summary

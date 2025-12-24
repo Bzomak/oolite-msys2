@@ -1,1 +1,4 @@
-base-devel autoconf mingw-w64-x86_64-gcc
+make
+patch
+autoconf
+mingw-w64-x86_64-gcc

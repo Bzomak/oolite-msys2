@@ -1,1 +1,4 @@
-base-devel autoconf mingw-w64-clang-x86_64-clang
+make
+patch
+autoconf
+mingw-w64-clang-x86_64-clang

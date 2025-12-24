@@ -93,7 +93,7 @@ echo "Oolite git ref set to: $GIT_REF"
 ###############################
 
 # Install build dependencies for GNUstep make
-read -r -a TOOLS_MAKE_MSYS2_DEPS <<< "$(cat ./deps/tools-make/msys2-deps)"
+mapfile -t TOOLS_MAKE_MSYS2_DEPS < ./deps/tools-make/msys2-deps
 pacman -S --noconfirm --needed "${TOOLS_MAKE_MSYS2_DEPS[@]}"
 
 # Clone tools-make repo
@@ -107,7 +107,7 @@ git clone https://github.com/gnustep/tools-make.git --branch="$TOOLS_MAKE_VERSIO
 ###############################
 
 # Install build dependencies for GNUstep libs-base
-read -r -a LIBS_BASE_MSYS2_DEPS <<< "$(cat ./deps/libs-base/msys2-deps)"
+mapfile -t LIBS_BASE_MSYS2_DEPS < ./deps/libs-base/msys2-deps
 pacman -S --noconfirm --needed "${LIBS_BASE_MSYS2_DEPS[@]}"
 
 # Clone libs-base repo - Needs https://github.com/gnustep/libs-base/pull/295
@@ -124,7 +124,7 @@ cd ..
 ###############################
 
 # Install build dependencies for SDL
-read -r -a SDL_MSYS2_DEPS <<< "$(cat ./deps/sdl/msys2-deps-MINGW64)"
+mapfile -t SDL_MSYS2_DEPS < ./deps/sdl/msys2-deps-MINGW64
 pacman -S --noconfirm --needed "${SDL_MSYS2_DEPS[@]}"
 
 # Download SDL and extract from tarball
@@ -141,7 +141,7 @@ tar -xf SDL-1.2.13.tar.gz
 # Install build dependencies for Oolite
 # Some of these are already installed, but we're reusing the list from the build Oolite job on GitHub Actions
 
-read -r -a OOLITE_MSYS2_DEPS <<< "$(cat ./oolite-config/msys2-deps-MINGW64)"
+mapfile -t OOLITE_MSYS2_DEPS < ./oolite-config/msys2-deps-MINGW64
 pacman -S --noconfirm --needed "${OOLITE_MSYS2_DEPS[@]}"
 
 # Clone Oolite repo and submodules
