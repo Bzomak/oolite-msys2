@@ -45,13 +45,6 @@ sed -i '2447 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85678
 sed -i '51 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
 
-# Fix inability to find js lib
-# Uncomment JS_LIB_DIR
-sed -i '30 s/^#//' GNUMakefile
-# Add JS_LIB_DIR to ADDITIONAL_OBJC_LIBS
-# shellcheck disable=SC2016
-sed -i '48 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
-
 # Use tool.make instead of objc.make
 # objc.make was deprecated in favour of tool.make in version 2.6.0 of GNUstep Make.
 sed -i 's/objc.make/tool.make/' GNUMakefile
@@ -61,6 +54,19 @@ sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble
 # Rename targets to make clear what they do
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
+###############################
+
+# Fix inability to find js lib
+# Uncomment JS_LIB_DIR
+sed -i '30 s/^#//' GNUMakefile
+# Add JS_LIB_DIR to ADDITIONAL_OBJC_LIBS
+# shellcheck disable=SC2016
+sed -i '48 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
+
+# shellcheck disable=SC2016
+# Keeping -I$(JS_INC_DIR)
+sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
+
 # Don't copy js dll here yet until we can build it ourselves.
 # sed needs to comment out lines 86 to 101 in Gnumakefile.postamble
 # Need to copy the correct dlls to the oolite.app folder
@@ -68,9 +74,7 @@ sed -i 's/pkg-win/pkg-win-release/' Makefile
 # dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
 sed -i '86,101 s/^/#/' Gnumakefile.postamble
 
-# shellcheck disable=SC2016
-# Keeping -I$(JS_INC_DIR)
-sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
+###############################
 
 # Try to build
 # shellcheck source=/dev/null
