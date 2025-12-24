@@ -48,11 +48,6 @@ sed -i '122 s/objc.make/tool.make/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUMakefile
 sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble 
 
-# Stop the installer from rebuilding Oolite
-sed -i '281 s/release //' Makefile
-sed -i '285 s/release-deployment //' Makefile
-sed -i '290 s/release-snapshot //' Makefile
-
 # Rename targets to make clear what they do
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
