@@ -54,9 +54,6 @@ sed -i 's/OBJC_PROGRAM_NAME/TOOL_NAME/' GNUmakefile.postamble
 # Rename targets to make clear what they do
 sed -i 's/pkg-win/pkg-win-release/' Makefile
 
-# Replace nsis path with correct one 
-sed -i "s|/nsis/makensis.exe|/$build_system/bin/makensis.exe|" Makefile
-
 # Don't copy js dll here yet until we can build it ourselves.
 # sed needs to comment out lines 86 to 101 in Gnumakefile.postamble
 # Need to copy the correct dlls to the oolite.app folder
