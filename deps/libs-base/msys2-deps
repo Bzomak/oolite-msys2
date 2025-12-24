@@ -1,4 +1,4 @@
-nake
+make
 mingw-w64-x86_64-gcc-objc
 mingw-w64-x86_64-gnutls
 mingw-w64-x86_64-icu
