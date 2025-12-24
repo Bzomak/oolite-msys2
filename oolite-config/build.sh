@@ -26,6 +26,8 @@ else
     exit 1
 fi
 
+echo "Checking MINGW_PREFIX: $(MINGW_PREFIX)"
+
 # Comment out Windows version checks in /$build_system/include/wingdi.h
 # This allows building with the HDR code on older versions of Windows.
 sed -i '2396 s|^|//|' /$build_system/include/wingdi.h
