@@ -39,15 +39,11 @@ echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
 sed -i '2396 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
 sed -i '2447 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
 
-# Add -fobjc-exceptions and -fcommon to OBJC flags in GNUMakefile, line 36
-# Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
-# C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: ./obj.win.spk/oolite.obj/OODebugSupport.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: multiple definition of `glClampColor'; ./obj.win.spk/oolite.obj/OODebugMonitor.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: first defined here
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85678
+# Add -fobjc-exceptions to OBJC flags in GNUMakefile when compiling with GCC on /mingw64
+# Fixes "error: '-fobjc-exceptions' is required to enable Objective-C exception syntax"
 if [ "$build_system" = "mingw64" ]; then
-#    sed -i '51 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
     sed -i '51 s/$/ -fobjc-exceptions/' GNUMakefile
 fi
-#sed -i '51 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
 
 # Use tool.make instead of objc.make
 # objc.make was deprecated in favour of tool.make in version 2.6.0 of GNUstep Make.
