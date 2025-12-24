@@ -43,6 +43,9 @@ sed -i '2447 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
 # Since gcc 10 -fno-common is default; add -fcommon to avoid 9425 (yes, 9425!) errors of the form
 # C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/13.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: ./obj.win.spk/oolite.obj/OODebugSupport.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: multiple definition of `glClampColor'; ./obj.win.spk/oolite.obj/OODebugMonitor.m.o:C:\msys64\home\Robert\oolite/src/Core/OOOpenGLExtensionManager.h:280: first defined here
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85678
+if [ "$build_system" = "mingw64" ]; then
+    sed -i '51 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
+fi
 #sed -i '51 s/$/ -fobjc-exceptions -fcommon/' GNUMakefile
 
 # Use tool.make instead of objc.make
