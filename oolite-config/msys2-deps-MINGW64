@@ -1,4 +1,3 @@
-base-devel
 git
 mingw-w64-x86_64-gcc-objc
 mingw-w64-x86_64-ntldd
