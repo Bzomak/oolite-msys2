@@ -1,4 +1,4 @@
-#! /usr/bin/bash -x
+#! /usr/bin/bash
 
 ###############################
 #
@@ -9,10 +9,17 @@
 #
 ###############################
 
+# Guard against nproc failing
+num_jobs=$(nproc 2>/dev/null)
+if [ -z "$num_jobs" ]; then
+    echo "Warning: Could not determine number of processors, using 1 job"
+    num_jobs=1
+fi
+
 # shellcheck source=/dev/null
 . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
 cd libs-base || exit
 # Use OpenStep plist format
 sed -i '336 s/NSPropertyListXMLFormat_v1_0/NSPropertyListOpenStepFormat/' Source/NSUserDefaults.m
 ./configure --disable-xslt
-make -j "$(nproc)"
+make -j"$num_jobs"

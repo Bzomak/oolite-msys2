@@ -1,17 +1,17 @@
-#! /usr/bin/bash -x
+#! /usr/bin/bash
 
 ###############################
 #
-# This script is for setting up a development environment for Oolite on MSYS2 MINGW64.
+# This script is for setting up a development environment for Oolite on MSYS2 MINGW64 or MSYS2 CLANG64 from a fresh MSYS2 install.
 #
 # The script expects to be run from the root of the oolite-msys2 repository.
 # It needs to be run from the root of the repository because it uses relative paths to find the build scripts for the dependencies and Oolite.
-# It therefore needs the whole of the oolite-msys2 repository to be present in the MSYS2 MINGW64 environment.
+# It therefore needs the whole of the oolite-msys2 repository to be present in the MSYS2 MINGW64 or MSYS2 CLANG64 environment.
 # It will download everything that it needs to set up a development environment from a fresh MSYS2 install and build Oolite.
 #
 # Download and install MSYS2 from https://www.msys2.org/#installation
 #
-# Open MSYS2 MINGW64
+# Open MSYS2 MINGW64 or MSYS2 CLANG64 shell.
 #
 # Update MSYS2 (May need to run twice. Not needed when using msys2/setup-msys2@v2 GitHub Action) by running the following command:
 # pacman -Syu
@@ -58,6 +58,27 @@ validate_git_ref() {
 BUILD_TYPE="release"
 GIT_REF="master"
 
+# Check if MINGW_PREFIX is set
+if [ -z "$MINGW_PREFIX" ]; then
+    echo "Error: MINGW_PREFIX is not set."
+    echo "This script must be run from an MSYS2 MINGW64 or CLANG64 environment."
+    exit 1
+fi
+
+# Extract build system from MINGW_PREFIX (e.g., /mingw64 -> mingw64)
+build_system=$(basename "$MINGW_PREFIX")
+
+# Validate build system
+if [ "$build_system" != "mingw64" ] && [ "$build_system" != "clang64" ]; then
+    echo "Error: Unsupported MINGW_PREFIX: $MINGW_PREFIX"
+    echo "Expected /mingw64 or /clang64"
+    exit 1
+fi
+
+echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
+
+###############################
+
 # Install git. It's not installed by default in MSYS2 MINGW64
 pacman -S --noconfirm --needed git
 
@@ -92,39 +113,49 @@ echo "Oolite git ref set to: $GIT_REF"
 
 ###############################
 
-# Install build dependencies for GNUstep make
-mapfile -t TOOLS_MAKE_MSYS2_DEPS < ./deps/tools-make/msys2-deps
-pacman -S --noconfirm --needed "${TOOLS_MAKE_MSYS2_DEPS[@]}"
+# Only build tools-make when building with MINGW64
+if [ "$build_system" = "mingw64" ]; then
 
-# Clone tools-make repo
-TOOLS_MAKE_VERSION=$(cat ./deps/tools-make/version)
-git clone https://github.com/gnustep/tools-make.git --branch="$TOOLS_MAKE_VERSION"
+    # Install build dependencies for GNUstep make
+    mapfile -t TOOLS_MAKE_MSYS2_DEPS < ./deps/tools-make/msys2-deps
+    pacman -S --noconfirm --needed "${TOOLS_MAKE_MSYS2_DEPS[@]}"
 
-# Make and Install gmake
-./deps/tools-make/build.sh
-./deps/tools-make/install.sh
+    # Clone tools-make repo
+    TOOLS_MAKE_VERSION=$(cat ./deps/tools-make/version)
+    git clone https://github.com/gnustep/tools-make.git --branch="$TOOLS_MAKE_VERSION"
+
+    # Make and Install gmake
+    ./deps/tools-make/build.sh
+    ./deps/tools-make/install.sh
+
+fi
 
 ###############################
 
-# Install build dependencies for GNUstep libs-base
-mapfile -t LIBS_BASE_MSYS2_DEPS < ./deps/libs-base/msys2-deps
-pacman -S --noconfirm --needed "${LIBS_BASE_MSYS2_DEPS[@]}"
+# Only build libs-base when building with MINGW64
+if [ "$build_system" = "mingw64" ]; then
 
-# Clone libs-base repo - Needs https://github.com/gnustep/libs-base/pull/295
-LIBS_BASE_VERSION=$(cat ./deps/libs-base/version)
-git clone https://github.com/gnustep/libs-base.git
-cd libs-base || exit 
-git checkout "$LIBS_BASE_VERSION"
-cd ..
+    # Install build dependencies for GNUstep libs-base
+    mapfile -t LIBS_BASE_MSYS2_DEPS < ./deps/libs-base/msys2-deps
+    pacman -S --noconfirm --needed "${LIBS_BASE_MSYS2_DEPS[@]}"
 
-# Make and install libs-base
-./deps/libs-base/build.sh
-./deps/libs-base/install.sh
+    # Clone libs-base repo - Needs https://github.com/gnustep/libs-base/pull/295
+    LIBS_BASE_VERSION=$(cat ./deps/libs-base/version)
+    git clone https://github.com/gnustep/libs-base.git
+    cd libs-base || exit 
+    git checkout "$LIBS_BASE_VERSION"
+    cd ..
+
+    # Make and install libs-base
+    ./deps/libs-base/build.sh
+    ./deps/libs-base/install.sh
+
+fi
 
 ###############################
 
 # Install build dependencies for SDL
-mapfile -t SDL_MSYS2_DEPS < ./deps/sdl/msys2-deps-MINGW64
+mapfile -t SDL_MSYS2_DEPS < "./deps/sdl/msys2-deps-${build_system^^}"
 pacman -S --noconfirm --needed "${SDL_MSYS2_DEPS[@]}"
 
 # Download SDL and extract from tarball
@@ -141,14 +172,14 @@ tar -xf SDL-1.2.13.tar.gz
 # Install build dependencies for Oolite
 # Some of these are already installed, but we're reusing the list from the build Oolite job on GitHub Actions
 
-mapfile -t OOLITE_MSYS2_DEPS < ./oolite-config/msys2-deps-MINGW64
+mapfile -t OOLITE_MSYS2_DEPS < "./oolite-config/msys2-deps-${build_system^^}"
 pacman -S --noconfirm --needed "${OOLITE_MSYS2_DEPS[@]}"
 
 # Clone Oolite repo and submodules
 git clone --recursive https://github.com/OoliteProject/oolite.git --branch="$GIT_REF"
 
 # Now let's try to compile Oolite
-./oolite-config/build.sh "$BUILD_TYPE" "MINGW64"
+./oolite-config/build.sh "$BUILD_TYPE"
 
 ###############################
 ###############################

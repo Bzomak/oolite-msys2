@@ -127,7 +127,7 @@ jobs:
 
       - name: Configure and build Oolite
         run: |
-          bash ./oolite-config/build.sh ${{ matrix.build_type }} ${{ matrix.msystem }}
+          bash ./oolite-config/build.sh ${{ matrix.build_type }}
 
       - name: Cache Oolite build
         uses: actions/cache/save@v5
@@ -425,7 +425,13 @@ jobs:
         run: |
           . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
           cd libs-base
-          make -j $(nproc) check
+          # Guard against nproc failing
+          num_jobs=$(nproc 2>/dev/null)
+          if [ -z "$num_jobs" ]; then
+            echo "Warning: Could not determine number of processors, using 1 job"
+            num_jobs=1
+          fi
+          make -j"$num_jobs" check
 
       - name: Upload tests.log
         uses: actions/upload-artifact@v6
@@ -470,7 +476,13 @@ jobs:
         run: |
           cd SDL-1.2.13/test
           ./configure
-          make -j $(nproc)
+          # Guard against nproc failing
+          num_jobs=$(nproc 2>/dev/null)
+          if [ -z "$num_jobs" ]; then
+            echo "Warning: Could not determine number of processors, using 1 job"
+            num_jobs=1
+          fi
+          make -j"$num_jobs" check
 
 ########################################
 ########################################
@@ -516,6 +528,7 @@ jobs:
     strategy:
       matrix:
         build_type: [debug, release, release-deployment, release-snapshot]
+        msystem: [MINGW64, CLANG64]
       fail-fast: false
 
     steps:
@@ -525,18 +538,18 @@ jobs:
       - name: Set up msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: ${{ matrix.msystem }}
           update: true
 
       - name: Run build script with provided Oolite ref
         if: ${{ inputs.oolite_ref != 'master' }}
         run: |
-          bash ./oolite-from-fresh-msys2-mingw64.sh -b ${{ matrix.build_type }} -r ${{ inputs.oolite_ref }}
+          bash ./oolite-from-fresh-msys2.sh -b ${{ matrix.build_type }} -r ${{ inputs.oolite_ref }}
 
       - name: Run build script with latest commit on Oolite master
         if: ${{ inputs.oolite_ref == 'master' }}
         run: |
-          bash ./oolite-from-fresh-msys2-mingw64.sh -b ${{ matrix.build_type }}
+          bash ./oolite-from-fresh-msys2.sh -b ${{ matrix.build_type }}
 
 ########################################
 ########################################

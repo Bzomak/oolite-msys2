@@ -1,4 +1,4 @@
-#! /usr/bin/bash -x
+#! /usr/bin/bash
 
 ###############################
 #
@@ -9,6 +9,13 @@
 #
 ###############################
 
+# Guard against nproc failing
+num_jobs=$(nproc 2>/dev/null)
+if [ -z "$num_jobs" ]; then
+    echo "Warning: Could not determine number of processors, using 1 job"
+    num_jobs=1
+fi
+
 cd tools-make || exit
 ./configure
-make -j "$(nproc)"
+make -j"$num_jobs"
