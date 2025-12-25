@@ -528,6 +528,7 @@ jobs:
     strategy:
       matrix:
         build_type: [debug, release, release-deployment, release-snapshot]
+        msystem: [MINGW64, CLANG64]
       fail-fast: false
 
     steps:
@@ -537,7 +538,7 @@ jobs:
       - name: Set up msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: ${{ matrix.msystem }}
           update: true
 
       - name: Run build script with provided Oolite ref
