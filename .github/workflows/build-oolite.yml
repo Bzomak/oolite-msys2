@@ -544,12 +544,12 @@ jobs:
       - name: Run build script with provided Oolite ref
         if: ${{ inputs.oolite_ref != 'master' }}
         run: |
-          bash ./oolite-from-fresh-msys2-mingw64.sh -b ${{ matrix.build_type }} -r ${{ inputs.oolite_ref }}
+          bash ./oolite-from-fresh-msys2.sh -b ${{ matrix.build_type }} -r ${{ inputs.oolite_ref }}
 
       - name: Run build script with latest commit on Oolite master
         if: ${{ inputs.oolite_ref == 'master' }}
         run: |
-          bash ./oolite-from-fresh-msys2-mingw64.sh -b ${{ matrix.build_type }}
+          bash ./oolite-from-fresh-msys2.sh -b ${{ matrix.build_type }}
 
 ########################################
 ########################################
