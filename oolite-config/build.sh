@@ -33,6 +33,13 @@ fi
 
 echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
 
+# Guard against nproc failing
+num_jobs=$(nproc 2>/dev/null)
+if [ -z "$num_jobs" ]; then
+    echo "Warning: Could not determine number of processors, using 1 job"
+    num_jobs=1
+fi
+
 # Comment out Windows version checks in /$build_system/include/wingdi.h
 # This allows building with the HDR code on older versions of Windows.
 # Only comment out if not already commented
@@ -76,7 +83,7 @@ sed -i '86,101 s/^/#/' Gnumakefile.postamble
 # Try to build
 # shellcheck source=/dev/null
 . "/$build_system/share/GNUstep/Makefiles/GNUstep.sh"
-make -j "$(nproc)" -f Makefile "$1"
+make -j"$num_jobs" -f Makefile "$1"
 
 cd ..
 # Temporary fix: copy nspr4.dll to oolite.app folder until we build the js lib ourselves.

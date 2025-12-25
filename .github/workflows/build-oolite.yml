@@ -425,7 +425,13 @@ jobs:
         run: |
           . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
           cd libs-base
-          make -j $(nproc) check
+          # Guard against nproc failing
+          num_jobs=$(nproc 2>/dev/null)
+          if [ -z "$num_jobs" ]; then
+            echo "Warning: Could not determine number of processors, using 1 job"
+            num_jobs=1
+          fi
+          make -j"$num_jobs" check
 
       - name: Upload tests.log
         uses: actions/upload-artifact@v6
@@ -470,7 +476,13 @@ jobs:
         run: |
           cd SDL-1.2.13/test
           ./configure
-          make -j $(nproc)
+          # Guard against nproc failing
+          num_jobs=$(nproc 2>/dev/null)
+          if [ -z "$num_jobs" ]; then
+            echo "Warning: Could not determine number of processors, using 1 job"
+            num_jobs=1
+          fi
+          make -j"$num_jobs" check
 
 ########################################
 ########################################

@@ -13,6 +13,13 @@
 
 cd oolite || exit
 
+# Guard against nproc failing
+num_jobs=$(nproc 2>/dev/null)
+if [ -z "$num_jobs" ]; then
+    echo "Warning: Could not determine number of processors, using 1 job"
+    num_jobs=1
+fi
+
 # Stop the installer from rebuilding Oolite when making the installer.
 sed -i '281 s/release //' Makefile
 sed -i '285 s/release-deployment //' Makefile
@@ -20,11 +27,11 @@ sed -i '290 s/release-snapshot //' Makefile
 
 # Map the build type to the correct Makefile target
 if [ "$1" = "release" ]; then
-    make -j "$(nproc)" -f Makefile pkg-win
+    make -j"$num_jobs" -f Makefile pkg-win
 elif [ "$1" = "release-deployment" ]; then
-    make -j "$(nproc)" -f Makefile pkg-win-deployment
+    make -j"$num_jobs" -f Makefile pkg-win-deployment
 elif [ "$1" = "release-snapshot" ]; then
-    make -j "$(nproc)" -f Makefile pkg-win-snapshot
+    make -j"$num_jobs" -f Makefile pkg-win-snapshot
 else
     echo "Error: Invalid build type. Use release, release-deployment, or release-snapshot"
     exit 1
