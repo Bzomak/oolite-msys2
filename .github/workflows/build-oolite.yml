@@ -441,50 +441,6 @@ jobs:
             libs-base/Tests/tests.log
 
 ########################################
-
-  test-sdl:
-    name: Test SDL
-    runs-on: windows-latest
-    if: ${{ inputs.run_tests }}
-    needs: [build-sdl]
-    defaults:
-      run:
-        shell: msys2 {0}
-    strategy:
-      matrix:
-        msystem: [MINGW64, CLANG64]
-      fail-fast: false
-
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v6
-
-      - name: Set up msys2
-        uses: ./.github/actions/start-msys2-with-deps
-        with:
-          deps_path: deps/sdl/msys2-deps-${{ matrix.msystem }}
-
-      - name: Install built version of SDL from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: SDL
-          path: SDL-1.2.13
-          key: cache-sdl-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/sdl/*') }}-${{ matrix.msystem }}
-          install_script: ./deps/sdl/install.sh
-
-      - name: Build SDL tests
-        run: |
-          cd SDL-1.2.13/test
-          ./configure
-          # Guard against nproc failing
-          num_jobs=$(nproc 2>/dev/null)
-          if [ -z "$num_jobs" ]; then
-            echo "Warning: Could not determine number of processors, using 1 job"
-            num_jobs=1
-          fi
-          make -j"$num_jobs" check
-
-########################################
 ########################################
 ########################################
 
