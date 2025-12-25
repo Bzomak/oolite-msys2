@@ -53,7 +53,6 @@ jobs:
     if: ${{ needs.check-recent-oolite-commits.outputs.has_commits == 'true' }}
     uses: ./.github/workflows/build-oolite.yml
     with:
-      run_tests: false
       from_fresh: false
       oolite_ref: master
 
