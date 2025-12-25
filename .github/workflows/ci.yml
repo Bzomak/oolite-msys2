@@ -3,17 +3,12 @@
 # This workflow is triggered on pushes to the main branch and pull requests, as well as manually via the GitHub Actions UI. 
 # It calls both the test-repo and build-oolite workflows.
 # If it is triggered by a workflow_dispatch event, it will pass those parameters to the build-oolite workflow.
-# Otherwise, it calls the build-oolite workflow with inputs to compile Oolite from the master branch, without running tests, and using pre-existing caches if available.
+# Otherwise, it calls the build-oolite workflow with inputs to compile Oolite from the master branch, using pre-existing caches if available.
 
 name: CI
 on: 
   workflow_dispatch:
     inputs:
-      run_tests:
-        description: Run build tests
-        required: false
-        type: boolean
-        default: false
       from_fresh:
         description: Build all dependencies from scratch
         required: false
@@ -47,7 +42,6 @@ jobs:
       actions: write
     uses: ./.github/workflows/build-oolite.yml
     with:
-      run_tests: ${{ inputs.run_tests || false }}
       from_fresh: ${{ inputs.from_fresh || false }}
       oolite_ref: ${{ inputs.oolite_ref || 'master' }}
 

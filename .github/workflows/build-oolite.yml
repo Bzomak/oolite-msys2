@@ -14,8 +14,6 @@
 # - build-tools-make: This job checks out the tools-make repository, compiles tools-make, and caches the build.
 # - build-libs-base: This job checks out the libs-base repository, compiles libs-base, and caches the build.
 # - build-sdl: This job downloads and compiles SDL, and caches the build.
-# - test-libs-base: This job uses the cache from the successful build-libs-base job and runs the tests on the built library.
-# - test-sdl: This job uses the cache from the successful build-sdl job and runs the tests on the built library
 # - clear-oolite-caches: This job deletes any caches created by the build-oolite job.
 # - build-oolite-from-fresh-msys2-mingw64: This job is a single script to build Oolite from scratch. It is used to test the from-fresh script.
 # - generate-pdfs: This job generates the PDFs of the Oolite documentation .odt files in the oolite/Doc/ folder.
@@ -25,11 +23,6 @@ name: Build Oolite on MSYS2 environments
 on: 
   workflow_call:
     inputs:
-      run_tests:
-        description: Run build tests
-        required: true
-        type: boolean
-        default: false
       from_fresh:
         description: Build all dependencies from scratch
         required: true
@@ -42,11 +35,6 @@ on:
         default: master
   workflow_dispatch:
     inputs:
-      run_tests:
-        description: Run build tests
-        required: true
-        type: boolean
-        default: false
       from_fresh:
         description: Build all dependencies from scratch
         required: true
