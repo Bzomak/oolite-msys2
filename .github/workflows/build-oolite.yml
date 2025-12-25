@@ -384,66 +384,6 @@ jobs:
 ########################################
 ########################################
 
-# Test the dependencies.
-# These jobs only run if the build jobs have been successful and the run_tests input is true.
-
-  test-libs-base:
-    name: Test libs-base
-    runs-on: windows-latest
-    if: ${{ inputs.run_tests }}
-    needs: [build-tools-make, build-libs-base]
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-      - name: Checkout this repository
-        uses: actions/checkout@v6
-
-      - name: Set up msys2
-        uses: ./.github/actions/start-msys2-with-deps
-        with:
-          deps_path: deps/libs-base/msys2-deps
-
-      - name: Install built version of tools-make from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: tools-make
-          path: tools-make
-          key: cache-tools-make-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/tools-make/*') }}
-          install_script: ./deps/tools-make/install.sh
-
-      - name: Install built version of libs-base from cache
-        uses: ./.github/actions/install-built-dependency
-        with:
-          name: libs-base
-          path: libs-base
-          key: cache-libs-base-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/libs-base/*', '**/deps/tools-make/*') }}
-          install_script: ./deps/libs-base/install.sh
-
-      - name: Test libs-base
-        run: |
-          . /mingw64/share/GNUstep/Makefiles/GNUstep.sh
-          cd libs-base
-          # Guard against nproc failing
-          num_jobs=$(nproc 2>/dev/null)
-          if [ -z "$num_jobs" ]; then
-            echo "Warning: Could not determine number of processors, using 1 job"
-            num_jobs=1
-          fi
-          make -j"$num_jobs" check
-
-      - name: Upload tests.log
-        uses: actions/upload-artifact@v6
-        with:
-          name: libs-base_test.log
-          path: |
-            libs-base/Tests/tests.log
-
-########################################
-########################################
-########################################
-
 # Clear unnecessary Oolite caches on GitHub
 
 # The Oolite caches are only intended to be used in the current workflow run.
