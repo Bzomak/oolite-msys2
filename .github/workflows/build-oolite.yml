@@ -369,6 +369,71 @@ jobs:
           delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
 
 ########################################
+
+  build-js:
+    name: Build JS
+    runs-on: windows-latest
+    needs: [check-oolite-ref]
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      matrix:
+        msystem: [MINGW64, CLANG64]
+        build_type: [debug, release]
+      fail-fast: false
+    env:
+      JS_VERSION:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v6
+
+      - name: Load dependency data into env
+        shell: bash
+        run: |
+          echo JS_VERSION=$(cat deps/js/version) >> $GITHUB_ENV
+
+      - name: Check cache status
+        id: cache-status
+        uses: ./.github/actions/early-exit-if-cache-exists
+        with:
+          name: oolite_mozjsnspr_mingw64
+          path: olite_mozjsnspr_mingw64
+          key: cache-js-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/js/*') }}-${{ matrix.msystem }}
+          from_fresh: ${{ inputs.from_fresh }}
+
+      - name: Set up msys2
+        if: steps.cache-status.outputs.early_exit != 'skip'
+        uses: ./.github/actions/start-msys2-with-deps
+        with:
+          msystem: ${{ matrix.msystem }}
+          deps_path: deps/js/msys2-deps-${{ matrix.msystem }}
+
+      - name: Checkout JS
+        if: steps.cache-status.outputs.early_exit != 'skip'
+        uses: actions/checkout@v6
+        with:
+          repository: mcarans/oolite_mozjsnspr_mingw64
+          path: oolite_mozjsnspr_mingw64
+          ref: ${{ env.JS_VERSION }}
+
+      - name: Configure and build JS
+        if: steps.cache-status.outputs.early_exit != 'skip'
+        run: |
+          bash ./deps/js/build.sh ${{ matrix.build_type }}
+
+      - name: Cache JS build
+        if: steps.cache-status.outputs.early_exit != 'skip'
+        uses: ./.github/actions/cache-built-dependency
+        with:
+          name: oolite_mozjsnspr_mingw64
+          path: oolite_mozjsnspr_mingw64
+          key: cache-js-${{ hashFiles('**/.github/workflows/build-oolite.yml', '**/deps/js/*') }}-${{ matrix.msystem }}
+          delete_existing_cache: ${{ inputs.from_fresh == true && steps.cache-status.outputs.cache_hit == 'true' }}
+          
+########################################
 ########################################
 ########################################
 
