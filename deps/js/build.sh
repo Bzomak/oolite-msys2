@@ -39,6 +39,8 @@ EOF
 chmod +x toolchain/g++
 export PATH="$PWD/toolchain:$PATH"
 which g++
+export CFLAGS="-Wno-c++11-narrowing"
+export CXXFLAGS="-Wc++11-narrowing"
 fi
 #sed -i 's/g++/$(CXX)/' Makefile.ref
 
