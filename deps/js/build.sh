@@ -9,6 +9,7 @@
 ###############################
 
 cd oolite_mozjsnspr_mingw64/js/src || exit
+sed -i 's/g++/$(CXX)/' Makefile.ref
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     ./build_js_release.sh
 elif [ "$1" = "debug" ]; then
