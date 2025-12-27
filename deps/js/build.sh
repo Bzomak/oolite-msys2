@@ -9,7 +9,33 @@
 ###############################
 
 cd oolite_mozjsnspr_mingw64/js/src || exit
-sed -i 's/g++/$(CXX)/' Makefile.ref
+
+# Check if MINGW_PREFIX is set
+if [ -z "$MINGW_PREFIX" ]; then
+    echo "Error: MINGW_PREFIX is not set."
+    echo "This script must be run from an MSYS2 MINGW64 or CLANG64 environment."
+    exit 1
+fi
+
+# Extract build system from MINGW_PREFIX (e.g., /mingw64 -> mingw64)
+build_system=$(basename "$MINGW_PREFIX")
+
+# Validate build system
+if [ "$build_system" != "mingw64" ] && [ "$build_system" != "clang64" ]; then
+    echo "Error: Unsupported MINGW_PREFIX: $MINGW_PREFIX"
+    echo "Expected /mingw64 or /clang64"
+    exit 1
+fi
+
+if [ "$build_system" = "mingw64" ]; then
+    export CC="gcc"
+    export CXX="g++"
+else
+    export CC="clang"
+    export CXX="clang++"
+fi
+#sed -i 's/g++/$(CXX)/' Makefile.ref
+
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     ./build_js_release.sh
 elif [ "$1" = "debug" ]; then
