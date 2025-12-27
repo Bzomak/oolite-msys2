@@ -27,12 +27,18 @@ if [ "$build_system" != "mingw64" ] && [ "$build_system" != "clang64" ]; then
     exit 1
 fi
 
-if [ "$build_system" = "mingw64" ]; then
-    export CC="gcc"
-    export CXX="g++"
-else
-    export CC="clang"
-    export CXX="clang++"
+echo "Using build system: $build_system (from MINGW_PREFIX: $MINGW_PREFIX)"
+
+if [ "$build_system" = "clang64" ]; then
+mkdir -p toolchain
+cat > toolchain/g++ <<'EOF'
+#!/usr/bin/env sh
+exec clang++ "$@"
+EOF
+
+chmod +x toolchain/g++
+export PATH="$PWD/toolchain:$PATH"
+which g++
 fi
 #sed -i 's/g++/$(CXX)/' Makefile.ref
 
