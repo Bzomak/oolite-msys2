@@ -44,6 +44,9 @@ export CXXFLAGS="-Wno-c++11-narrowing -Wno-register"
 fi
 #sed -i 's/g++/$(CXX)/' Makefile.ref
 
+# Stop redefining buildin js_copysign
+sed -i 's/#if defined _WIN32 \&\& !defined WINCE \&\& _MSC_VER < 1400/#if defined(_MSC_VER) \&\& _MSC_VER < 1400 \&\& !defined(__clang__) \&\& !defined(__GNUC__)/' jsmath.cpp
+
 if [ "$1" = "release" ] || [ "$1" = "release-deployment" ] || [ "$1" = "release-snapshot" ]; then
     ./build_js_release.sh
 elif [ "$1" = "debug" ]; then
