@@ -40,12 +40,6 @@ if [ -z "$num_jobs" ]; then
     num_jobs=1
 fi
 
-# Comment out Windows version checks in /$build_system/include/wingdi.h
-# This allows building with the HDR code on older versions of Windows.
-# Only comment out if not already commented
-sed -i '2396 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
-sed -i '2447 s|^\([^/]\)|//\1|' "/$build_system/include/wingdi.h"
-
 # Add -fobjc-exceptions to OBJC flags in GNUMakefile when compiling with GCC on /mingw64
 # Fixes "error: '-fobjc-exceptions' is required to enable Objective-C exception syntax"
 if [ "$build_system" = "mingw64" ]; then
