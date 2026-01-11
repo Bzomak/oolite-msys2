@@ -66,11 +66,11 @@ sed -i '48 s/-l$(JS_IMPORT_LIBRARY) /-L$(JS_LIB_DIR) &/' GNUMakefile
 sed -i '47 s/$/ -I$(JS_INC_DIR) /' GNUMakefile
 
 # Don't copy js dll here yet until we can build it ourselves.
-# sed needs to comment out lines 86 to 101 in Gnumakefile.postamble
+# sed needs to comment out lines 90 to 107 in Gnumakefile.postamble
 # Need to copy the correct dlls to the oolite.app folder
 # Some dlls missing, so using my own script to copy them (seems to be the same, but will be easier to debug)
 # dlls not copied for debug build in Oolite's Makefile, so need to handle that here too
-sed -i '86,101 s/^/#/' Gnumakefile.postamble
+sed -i '90,107 s/^/#/' Gnumakefile.postamble
 
 ###############################
 
