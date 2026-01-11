@@ -20,10 +20,12 @@ if [ -z "$num_jobs" ]; then
     num_jobs=1
 fi
 
-# Stop the installer from rebuilding Oolite when making the installer.
-sed -i '281 s/release //' Makefile
-sed -i '285 s/release-deployment //' Makefile
-sed -i '290 s/release-snapshot //' Makefile
+# Modify the Windows installer build targets to stop building Oolite when making the installer.
+# We assume Oolite is already built.
+# Without this, the installer build target rebuilds Oolite.
+sed -i 's/pkg-win: release/pkg-win:/' Makefile
+sed -i 's/pkg-win-deployment: release-deployment/pkg-win-deployment:/' Makefile
+sed -i 's/pkg-win-snapshot: release-snapshot/pkg-win-snapshot:/' Makefile
 
 # Map the build type to the correct Makefile target
 if [ "$1" = "release" ]; then
