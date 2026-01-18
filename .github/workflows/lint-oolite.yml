@@ -1,0 +1,33 @@
+# Workflow to lint the Oolite codebase
+
+name: Lint Oolite
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+
+
+########################################
+########################################
+########################################
+
+  ShellCheck:
+    name: ShellCheck Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Oolite repository
+        uses: actions/checkout@v6
+        with:
+          repository: OoliteProject/oolite
+          path: oolite
+          submodules: recursive
+
+      - name: Check installed ShellCheck version
+        run: shellcheck --version
+
